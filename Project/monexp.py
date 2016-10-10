@@ -3,14 +3,21 @@
 #M= 0x0aaabbbb
 #N= 0x819dc6b2
 #E= 0x70df64f3
-M=19
-E=5
-N=119
+
+#M=19
+#E=5
+#N=119
 #R= 2**128
 R= 2**32
+#R= 2**7
 #Result= 0x79114D01
-Result=66
+#Result=66
 
+M= 178961
+E= 18937
+N= 217465
+
+Result = 5111
 
 print('M=',hex(M))
 print('N=',hex(N))
@@ -47,31 +54,43 @@ def blakley(a,b,n):
 	return p
 
 
+# Returns u = a\*b\*r^-1 (mod n)
 def monpro(a,b,n):
+	print('monpro: ',a,b,b)
 	u=0
 	k=len(bin(n))-2
 	for i in range(0,k):
 		#u=u+a[i]*b
-		if (a & (1 << i)) != 0:
+		if getBitAt(a,i):
 			u = u + b
 
-		if (u%2==1):
+		if (u%2!=0):
 			u=u+n
 		u=u>>1
+		print('i:', i, 'b:', b, 'u:',u)
+		if (u >= n):
+			u = u - n
 	return u
+
+
+#def monpro(a,b,n):
+#	t = a*b
+#	m = blakley(t,n,R)
+#	u = (t+m*n)
 
 def modexp(m,e,n,r):
 	k=len(bin(e))-2
 	#m_ = blakley(m,r,n)
 	m_ = blakley(r,m,n)
-	#x_= blakley(r,1,n)
 	x_= blakley(r,0x1,n)
+	#x_= blakley(0x1,r,n)
 	print(m_,x_)
-	for i in range(k-1,-1,-1):
+	for i in range(k-1,0,-1):
 		x_=monpro(x_,x_,n)
 		print('x_: ',hex(x_))
 		#if e[i]==1:
-		if (e & (1 << i)) != 0:
+#		if (e & (1 << i)) != 0:
+		if getBitAt(e,i):
 			x_=monpro(m_,x_,n)
 	x=monpro(x_,1,n)
 	return x
@@ -83,6 +102,7 @@ print(blakley(5,5,5))
 
 #print(bin(blakley(M,M,N)))
 #print(bin(monpro(M,M,N)))
-print(hex(modexp(M,E,N,R)))
+#print(hex(modexp(M,E,N,R)))
+print(modexp(98, 19, 129,2**8))
 
-print('Expected: ', hex(Result))
+#print('Expected: ', hex(Result))
