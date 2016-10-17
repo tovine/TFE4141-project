@@ -13,12 +13,12 @@ def getBitAt(a, n):
 def blakley(a,b,n):
 #	k=len(bin(a))-2
 	k=max(len(bin(a))-2, len(bin(b))-2)
-#	k=128
+	k=128
 	print('Blakley: ',hex(a),hex(b),hex(n))
 	p=0
-	for i in range(0,k): # Python ranges are not inclusive
+	for i in range(0,k+1):
 		p = p << 1
-		if getBitAt(a,(k-i-1)):
+		if getBitAt(a,(k-i)):
 			p = p + b
 		if p>=n:
 			p=p-n
@@ -28,7 +28,7 @@ def blakley(a,b,n):
 
 	print('Blakley siste p: ', hex(p))
 	print('a*b mod n: ', hex(a*b%n))
-	assert(p == a*b%n)
+#	assert(p == a*b%n)
 	return p
 
 
@@ -37,6 +37,7 @@ def monpro(a,b,n):
 	print('monpro: ',a,b,n)
 	u=0
 	k=len(bin(n))-1
+	k=128
 	for i in range(0,k):
 		#u=u+a[i]*b
 		if getBitAt(a,i):
@@ -51,7 +52,7 @@ def monpro(a,b,n):
 		print('i:', i, 'b:', b, 'u:',u)
 	if (u >= n):
 		u = u - n
-	print('i:', i, 'b:', b, 'u:',u)
+#	print('i:', i, 'b:', b, 'u:',u)
 	return u
 
 def modexp(m,e,n,r):
@@ -61,7 +62,7 @@ def modexp(m,e,n,r):
 	x_= blakley(r,0x1,n) # = R*mod(n)
 	#x_= blakley(0x1,r,n)
 	print(m_,x_)
-	for i in range(k-1,0,-1):
+	for i in range(k,0,-1):
 		x_=monpro(x_,x_,n)
 		print('x_: ',hex(x_))
 		#if e[i]==1:
