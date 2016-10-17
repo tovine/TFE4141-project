@@ -1,0 +1,19 @@
+Example inputs and expected results:
+====================================
+M= 0x0aaabbbb
+E= 0x70df64f3
+N= 0x819dc6b2
+R= 0x100000000
+Result= 0x79114D01
+----
+M= 19
+E= 5
+N= 119
+R= 0x80
+Result= 66
+----
+M= 178961
+E= 18937
+N= 217465
+R= 0x40000
+Result = 5111
