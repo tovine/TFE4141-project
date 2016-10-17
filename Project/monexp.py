@@ -58,7 +58,7 @@ def modexp(m,e,n,r):
 	k=len(bin(e))-2
 	#m_ = blakley(m,r,n)
 	m_ = blakley(r,m,n)
-	x_= blakley(r,0x1,n)
+	x_= blakley(r,0x1,n) # = R*mod(n)
 	#x_= blakley(0x1,r,n)
 	print(m_,x_)
 	for i in range(k-1,0,-1):
@@ -74,15 +74,16 @@ print("sys.argv length:", len(sys.argv), sys.argv)
 if len(sys.argv) is 5:
 	if re.match("[0-9]", sys.argv[1]):
 		# We can assume that all input are numeric - run modexp with the given arguments
-		print(modexp(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])))
+		result = modexp(int(sys.argv[1],0), int(sys.argv[2],0), int(sys.argv[3],0), int(sys.argv[4],0))
+		print(result, hex(result))
 	elif sys.argv[1] == 'b':
-		print(blakley(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])))
+		print(blakley(int(sys.argv[2],0), int(sys.argv[3],0), int(sys.argv[4],0)))
 	elif sys.argv[1] == 'mp':
-		print(monpro(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])))
+		print(monpro(int(sys.argv[2],0), int(sys.argv[3],0), int(sys.argv[4],0)))
 
 elif len(sys.argv) is 4:
 	if sys.argv[1] == 'gba':
-		print(bin(int(sys.argv[2])), getBitAt(int(sys.argv[2]), int(sys.argv[3])))
+		print(bin(int(sys.argv[2],0)), getBitAt(int(sys.argv[2],0), int(sys.argv[3],0)))
 
 else:
 	print("""Available functions:
