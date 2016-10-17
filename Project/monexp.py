@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys, re
+
 #M= 0x0aaabbbb
 #N= 0x819dc6b2
 #E= 0x70df64f3
@@ -19,10 +21,10 @@ N= 217465
 
 Result = 5111
 
-print('M=',hex(M))
-print('N=',hex(N))
-print('E=',hex(E))
-print('R=',hex(R))
+#print('M=',hex(M))
+#print('N=',hex(N))
+#print('E=',hex(E))
+#print('R=',hex(R))
 
 #Helper function - returns the value of the bit at position 'n' of the number 'a'
 def getBitAt(a, n):
@@ -100,15 +102,36 @@ def modexp(m,e,n,r):
 	x=monpro(x_,1,n)
 	return x
 
+print("sys.argv length:", len(sys.argv), sys.argv)
+if len(sys.argv) is 5:
+	if re.match("[0-9]", sys.argv[1]):
+		# We can assume that all input are numeric - run modexp with the given arguments
+		print(modexp(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])))
+	elif sys.argv[1] == 'b':
+		print(blakley(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])))
+	elif sys.argv[1] == 'mp':
+		print(monpro(int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])))
 
-print(blakley(6,1,5))
-print(blakley(5,5,5))
+elif len(sys.argv) is 4:
+	if sys.argv[1] == 'gba':
+		print(bin(int(sys.argv[2])), getBitAt(int(sys.argv[2]), int(sys.argv[3])))
+
+else:
+	print("""Available functions:
+	'gba' - getBitAt(n,i), get bit i of the number n
+	'b' - blakley(a,b,n)
+	'mp' - monpro(a,b,n)
+	default: modexp(m,e,n,r)""")
+
+
+#print(blakley(6,1,5))
+#print(blakley(5,5,5))
 #print(blakley(M,M,N))
 
 #print(bin(blakley(M,M,N)))
 #print(bin(monpro(M,M,N)))
 #print(hex(modexp(M,E,N,R)))
-print(modexp(98, 19, 129,2**8))
-print(monpro(3, 3, 13))
+#print(modexp(98, 19, 129,2**8))
+#print(monpro(3, 3, 13))
 
 #print('Expected: ', hex(Result))
