@@ -56,20 +56,25 @@ def blakley(a,b,n):
 
 # Returns u = a\*b\*r^-1 (mod n)
 def monpro(a,b,n):
-	print('monpro: ',a,b,b)
+	print('monpro: ',a,b,n)
 	u=0
-	k=len(bin(n))-2
+	k=len(bin(n))-1
 	for i in range(0,k):
 		#u=u+a[i]*b
 		if getBitAt(a,i):
 			u = u + b
+		print(bin(u))
 
-		if (u%2!=0):
+		if getBitAt(u,0):
+		#if (u%2!=0):
 			u=u+n
+		print(bin(u))
 		u=u>>1
+		print(bin(u))
 		print('i:', i, 'b:', b, 'u:',u)
-		if (u >= n):
-			u = u - n
+	if (u >= n):
+		u = u - n
+	print('i:', i, 'b:', b, 'u:',u)
 	return u
 
 
@@ -104,5 +109,6 @@ print(blakley(5,5,5))
 #print(bin(monpro(M,M,N)))
 #print(hex(modexp(M,E,N,R)))
 print(modexp(98, 19, 129,2**8))
+print(monpro(3, 3, 13))
 
 #print('Expected: ', hex(Result))
