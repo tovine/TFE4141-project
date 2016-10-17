@@ -72,7 +72,7 @@ def modexp(m,e,n,r):
 
 print("sys.argv length:", len(sys.argv), sys.argv)
 if len(sys.argv) is 5:
-	if re.match("[0-9]", sys.argv[1]):
+	if re.match("[0-9]*", sys.argv[1]):
 		# We can assume that all input are numeric - run modexp with the given arguments
 		result = modexp(int(sys.argv[1],0), int(sys.argv[2],0), int(sys.argv[3],0), int(sys.argv[4],0))
 		print(result, hex(result))
