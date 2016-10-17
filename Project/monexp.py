@@ -2,30 +2,6 @@
 
 import sys, re
 
-#M= 0x0aaabbbb
-#N= 0x819dc6b2
-#E= 0x70df64f3
-
-#M=19
-#E=5
-#N=119
-#R= 2**128
-R= 2**32
-#R= 2**7
-#Result= 0x79114D01
-#Result=66
-
-M= 178961
-E= 18937
-N= 217465
-
-Result = 5111
-
-#print('M=',hex(M))
-#print('N=',hex(N))
-#print('E=',hex(E))
-#print('R=',hex(R))
-
 #Helper function - returns the value of the bit at position 'n' of the number 'a'
 def getBitAt(a, n):
 	if n >= 0 and (a & (1 << (n))) != 0:
@@ -68,7 +44,6 @@ def monpro(a,b,n):
 		print(bin(u))
 
 		if getBitAt(u,0):
-		#if (u%2!=0):
 			u=u+n
 		print(bin(u))
 		u=u>>1
@@ -78,12 +53,6 @@ def monpro(a,b,n):
 		u = u - n
 	print('i:', i, 'b:', b, 'u:',u)
 	return u
-
-
-#def monpro(a,b,n):
-#	t = a*b
-#	m = blakley(t,n,R)
-#	u = (t+m*n)
 
 def modexp(m,e,n,r):
 	k=len(bin(e))-2
@@ -96,7 +65,6 @@ def modexp(m,e,n,r):
 		x_=monpro(x_,x_,n)
 		print('x_: ',hex(x_))
 		#if e[i]==1:
-#		if (e & (1 << i)) != 0:
 		if getBitAt(e,i):
 			x_=monpro(m_,x_,n)
 	x=monpro(x_,1,n)
@@ -122,16 +90,3 @@ else:
 	'b' - blakley(a,b,n)
 	'mp' - monpro(a,b,n)
 	default: modexp(m,e,n,r)""")
-
-
-#print(blakley(6,1,5))
-#print(blakley(5,5,5))
-#print(blakley(M,M,N))
-
-#print(bin(blakley(M,M,N)))
-#print(bin(monpro(M,M,N)))
-#print(hex(modexp(M,E,N,R)))
-#print(modexp(98, 19, 129,2**8))
-#print(monpro(3, 3, 13))
-
-#print('Expected: ', hex(Result))
