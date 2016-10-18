@@ -12,14 +12,21 @@ def getBitAt(a, n):
 # Returns a*b mod n - seems to work, as long as r is passed as parameter 1
 def blakley(a,b,n):
 #	k=len(bin(a))-2
-	k=max(len(bin(a))-2, len(bin(b))-2)
-	k=128
+        # !!!! YHY
+	#k=max(len(bin(a))-2, len(bin(b))-2) # Not needed
+        # !!!! YHY
+	k=129 # 2^128 is a 129 bit number!
 	print('Blakley: ',hex(a),hex(b),hex(n))
 	p=0
-	for i in range(0,k+1):
-		p = p << 1
-		if getBitAt(a,(k-i)):
-			p = p + b
+	#for i in range(0,k+1):
+        # !!!! YHY
+	for i in range(0,k):# You must iterate from 0 to k-1              
+                p = p << 1
+
+                #if getBitAt(a,(k-i)):
+                # !!!! YHY
+                if getBitAt(a,(k-1-i)): # See introduction slide page 14 or "high_speed_rsa_implementation.pdf" page 45. You need to find bit a_(k-i-i), not bit a_(k-i)
+                        p = p + b
 		if p>=n:
 			p=p-n
 		if p>=n:
@@ -36,7 +43,8 @@ def blakley(a,b,n):
 def monpro(a,b,n):
 	print('monpro: ',a,b,n)
 	u=0
-	k=len(bin(n))-1
+        # !!!! YHY
+	#k=len(bin(n))-1 # Not necessary!
 	k=128
 	for i in range(0,k):
 		#u=u+a[i]*b
@@ -56,13 +64,22 @@ def monpro(a,b,n):
 	return u
 
 def modexp(m,e,n,r):
-	k=len(bin(e))-2
+	# !!!! YHY
+        #k=len(bin(e))-2 # k is always 128 bit no matter how small e is!
+        k=128
 	#m_ = blakley(m,r,n)
-	m_ = blakley(r,m,n)
-	x_= blakley(r,0x1,n) # = R*mod(n)
+        #m_ = blakley(r,m,n)
+	#x_= blakley(r,0x1,n) # = R*mod(n)
+        # !!!! YHY
+	m_ = blakley(2**128,m,n) # r = 2^k = 2^128 always
+        # !!!! YHY
+	x_= blakley(2**128,0x1,n) # = R*mod(n)
 	#x_= blakley(0x1,r,n)
 	print(m_,x_)
-	for i in range(k,0,-1):
+	# !!!! YHY
+        #for i in range(k,0,-1): # If k=5, then this line will iterate through 5,4,3,2,1. Not 4,3,2,1,0
+        # !!!! YHY
+        for i in range(k-1,-1,-1):
 		x_=monpro(x_,x_,n)
 		print('x_: ',hex(x_))
 		#if e[i]==1:
