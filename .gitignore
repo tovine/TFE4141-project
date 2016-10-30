@@ -1,0 +1,4 @@
+#Ignore Vivado compiler output
+RSA_module.runs/
+RSA_module.cache/
+RSA_module.hw/
