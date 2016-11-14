@@ -72,13 +72,15 @@ DUT : entity work.blakley
     begin
         Reset_n_tb <='0';
                 a_tb <= x"00000000000000000000000100000000";
-                b_tb <= x"0000000000000000000000000aaabbbb";
-                n_tb <= x"000000000000000000000000819dc6b2";
+--                b_tb <= x"0000000000000000000000000aaabbbb";
+--                n_tb <= x"000000000000000000000000819dc6b2";
+                b_tb <= x"0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+                n_tb <= x"819DC6B2574E12C3C8BC49CDD79555FD";
         wait for 20 ns;
 --        a_tb <= "0x0aaabbbb"; -- TODO: find good test stimuli
 --        b_tb <= "0x
           Reset_n_tb <= '1';
-        wait for 2us;
+        wait for 20us;
         --wait for done = '1';
         -- Repeat
         --ASSERT 0;
