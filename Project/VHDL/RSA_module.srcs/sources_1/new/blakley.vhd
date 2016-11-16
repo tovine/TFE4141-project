@@ -46,37 +46,38 @@ end blakley;
 
 architecture Behavioral of blakley is
     signal counter: INTEGER range 0 to OPERAND_WIDTH;-- (7 downto 0);
-    signal p_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0); -- TODO: check if it must be 129 bits
 begin
     process(clk, reset_n)
         variable should_add : STD_LOGIC;
+        variable p_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
     begin
         if (reset_n = '0') then
-            p_tmp <= (others => '0');
+            p_tmp := (others => '0');
             counter <= 0;
             done <= '0';
+            should_add := '0';
         elsif (clk'EVENT AND clk='1') then
             if (counter = OPERAND_WIDTH) then    
-                p <= p_tmp;
                 done <= '1';
                 counter <= 0;
+                should_add := '0';
             else
                 --p_tmp <= shift_left(p_tmp, std_logic_vector(1));
-                p_tmp <= p_tmp(OPERAND_WIDTH-2 DOWNTO 0) & "0";
+                p_tmp := p_tmp(OPERAND_WIDTH-2 DOWNTO 0) & "0";
                 should_add := a(OPERAND_WIDTH - 1 - counter);                
                 if (should_add = '1') then
-                    p_tmp <= p_tmp + b;
+                    p_tmp := p_tmp + b;
                 end if;
                 if ("0" & p_tmp(OPERAND_WIDTH-1 downto 1) > n) then
-                    p_tmp <= p_tmp - (n(OPERAND_WIDTH-2 downto 0) & "0");
+                    p_tmp := p_tmp - (n(OPERAND_WIDTH-2 downto 0) & "0");
                 elsif (p_tmp > n) then
-                      p_tmp <= p_tmp - n;
+                    p_tmp := p_tmp - n;
                 end if;
             
                 counter <= counter + 1;
             end if;
         end if;
-        
+        p <= p_tmp;
     end process;
     
 end Behavioral;
