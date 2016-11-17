@@ -51,16 +51,15 @@ begin
         variable should_add : STD_LOGIC;
         variable p_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
     begin
+        should_add := '0';
         if (reset_n = '0') then
             p_tmp := (others => '0');
             counter <= 0;
             done <= '0';
-            should_add := '0';
         elsif (clk'EVENT AND clk='1') then
             if (counter = OPERAND_WIDTH) then    
                 done <= '1';
                 counter <= 0;
-                should_add := '0';
             else
                 --p_tmp <= shift_left(p_tmp, std_logic_vector(1));
                 p_tmp := p_tmp(OPERAND_WIDTH-2 DOWNTO 0) & "0";
