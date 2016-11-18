@@ -36,22 +36,21 @@ entity monpro is
 
     generic (OPERAND_WIDTH : integer := 128);
 
-    Port ( a : in STD_LOGIC_VECTOR (127 downto 0);
-           b : in STD_LOGIC_VECTOR (127 downto 0);
-           n : in STD_LOGIC_VECTOR (127 downto 0);
+    Port ( a : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+           b : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+           n : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+           result : out STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
            clk : in STD_LOGIC;
            reset_n : in STD_LOGIC;
-           result : out STD_LOGIC_VECTOR (127 downto 0);
            done : out STD_LOGIC);
 end monpro;
 
 architecture Behavioral of monpro is
-    signal counter: INTEGER range 0 to OPERAND_WIDTH := 0;-- (7 downto 0);
-
+    signal counter: INTEGER range 0 to OPERAND_WIDTH;-- (7 downto 0);
 begin
     process(clk, reset_n)
-        variable result_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
         variable should_add : STD_LOGIC;
+        variable result_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
     begin
         should_add := '0';
         if (reset_n = '0') then
@@ -63,7 +62,6 @@ begin
                 if (result_tmp >= n) then
                     result_tmp := result_tmp - n;
                 end if;
-                result <= result_tmp;
                 done <= '1';
                 counter <= 0;
             else
@@ -74,10 +72,11 @@ begin
                 if (result_tmp(0) = '1') then
                     result_tmp := result_tmp + n;
                 end if;
-                result_tmp := ("0" & result_tmp(OPERAND_WIDTH-2 downto 0)); -- right shift by one
+                result_tmp := ("0" & result_tmp(OPERAND_WIDTH-1 downto 1)); -- right shift by one
                 counter <= counter + 1;
             end if;
         end if; -- clock edge
+        result <= result_tmp(OPERAND_WIDTH-1 downto 0);
     end process;
 
 end Behavioral;

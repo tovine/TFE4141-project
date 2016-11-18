@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="blakley_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="blakley_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="2404500000fs"></ZoomStartTime>
+      <ZoomEndTime time="3380039570fs"></ZoomEndTime>
+      <Cursor1Time time="2603061000fs"></Cursor1Time>
+   </zoom_setting>
+   <WVObjectSize size="11" />
+   <wvobject fp_name="/blakley_tb/Clk_tb" type="logic">
+      <obj_property name="ElementShortName">Clk_tb</obj_property>
+      <obj_property name="ObjectShortName">Clk_tb</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/Reset_n_tb" type="logic">
+      <obj_property name="ElementShortName">Reset_n_tb</obj_property>
+      <obj_property name="ObjectShortName">Reset_n_tb</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/DUT/a" type="array">
+      <obj_property name="ElementShortName">a[127:0]</obj_property>
+      <obj_property name="ObjectShortName">a[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/DUT/b" type="array">
+      <obj_property name="ElementShortName">b[127:0]</obj_property>
+      <obj_property name="ObjectShortName">b[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/DUT/n" type="array">
+      <obj_property name="ElementShortName">n[127:0]</obj_property>
+      <obj_property name="ObjectShortName">n[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/DUT/p_tmp" type="array">
+      <obj_property name="ElementShortName">p_tmp[127:0]</obj_property>
+      <obj_property name="ObjectShortName">p_tmp[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/DUT/p" type="array">
+      <obj_property name="ElementShortName">p[127:0]</obj_property>
+      <obj_property name="ObjectShortName">p[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/OPERAND_WIDTH" type="other">
+      <obj_property name="ElementShortName">OPERAND_WIDTH</obj_property>
+      <obj_property name="ObjectShortName">OPERAND_WIDTH</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/DUT/reset_n" type="logic">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/blakley_tb/DUT/counter" type="other">
+      <obj_property name="ElementShortName">counter</obj_property>
+      <obj_property name="ObjectShortName">counter</obj_property>
+   </wvobject>
+</wave_config>

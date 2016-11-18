@@ -3,4 +3,5 @@ RSA_module.runs/
 RSA_module.cache/
 RSA_module.hw/
 RSA_module.sim/
+RSA_module.ip_user_files/
 *.str
