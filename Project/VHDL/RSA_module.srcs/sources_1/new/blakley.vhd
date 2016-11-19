@@ -41,22 +41,34 @@ entity blakley is
            p : out STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
            clk : in STD_LOGIC;
            reset_n : in STD_LOGIC;
+           start : in STD_LOGIC;
            done : out STD_LOGIC);
 end blakley;
 
 architecture Behavioral of blakley is
     signal counter: INTEGER range 0 to OPERAND_WIDTH;-- (7 downto 0);
+    signal running: std_logic;
 begin
+
+    process(start) -- simple process to start the blakley operation
+    begin
+        if (running = '0' AND start = '1') then -- TODO: replace runnig with done?
+            running <= '1';
+            done <= '0';
+        end if;
+    end process;
+    
     process(clk, reset_n)
         variable should_add : STD_LOGIC;
         variable p_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
     begin
         should_add := '0';
         if (reset_n = '0') then
+            running <= '0';
             p_tmp := (others => '0');
             counter <= 0;
             done <= '0';
-        elsif (clk'EVENT AND clk='1') then
+        elsif (running = '1' AND clk'EVENT AND clk='1') then
             if (counter = OPERAND_WIDTH) then    
                 done <= '1';
                 counter <= 0;

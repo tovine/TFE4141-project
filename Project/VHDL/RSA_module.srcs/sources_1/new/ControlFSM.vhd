@@ -37,10 +37,18 @@ entity ControlFSM is
            init_rsa : in STD_LOGIC;
            start_rsa : in STD_LOGIC;
            core_finished : out STD_LOGIC;
+           -- Control signals for datapath
            load_msg : out STD_LOGIC_VECTOR (3 downto 0);
            load_key_n : out STD_LOGIC_VECTOR (3 downto 0);
            load_key_e : out STD_LOGIC_VECTOR (3 downto 0);
-           operation_sel : out STD_LOGIC);
+           output_result : out STD_LOGIC_VECTOR (3 downto 0);
+           start_monpro : out STD_LOGIC;
+           start_blakley : out STD_LOGIC;
+           -- Status inputs from datapath
+           monpro_done : in STD_LOGIC;
+           blakley_done : in STD_LOGIC
+    );
+
 end ControlFSM;
 
 architecture Behavioral of ControlFSM is

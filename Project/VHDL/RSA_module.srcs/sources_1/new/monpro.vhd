@@ -42,22 +42,34 @@ entity monpro is
            result : out STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
            clk : in STD_LOGIC;
            reset_n : in STD_LOGIC;
+           start : in STD_LOGIC;
            done : out STD_LOGIC);
 end monpro;
 
 architecture Behavioral of monpro is
     signal counter: INTEGER range 0 to OPERAND_WIDTH;-- (7 downto 0);
+    signal running: std_logic;
 begin
+
+    process(start) -- simple process to start the operation
+    begin
+        if (running = '0' AND start = '1') then -- TODO: replace runnig with done?
+            running <= '1';
+            done <= '0';
+        end if;
+    end process;
+    
     process(clk, reset_n)
         variable should_add : STD_LOGIC;
         variable result_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
     begin
         should_add := '0';
         if (reset_n = '0') then
+            running <= '0';
             result_tmp := (others => '0');
             counter <= 0;
             done <= '0';
-        elsif (clk'event AND clk = '1') then
+        elsif (running = '1' AND clk'event AND clk = '1') then
             if (counter = OPERAND_WIDTH) then -- Done computing, reduce result and return
                 if (result_tmp >= n) then
                     result_tmp := result_tmp - n;

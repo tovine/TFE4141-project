@@ -46,8 +46,12 @@ architecture Behavioral of RSACore is
     signal load_msg : STD_LOGIC_VECTOR (3 downto 0);
     signal load_key_n : STD_LOGIC_VECTOR (3 downto 0);
     signal load_key_e : STD_LOGIC_VECTOR (3 downto 0);
-    signal operation_sel : STD_LOGIC;
-    
+    signal output_result : STD_LOGIC_VECTOR (3 downto 0);
+    signal start_monpro : STD_LOGIC;
+    signal start_blakley : STD_LOGIC;
+    signal blakley_done : STD_LOGIC;
+    signal monpro_done : STD_LOGIC;
+        
 begin
 control: entity work.ControlFSM
     port map (
@@ -59,16 +63,26 @@ control: entity work.ControlFSM
         load_msg => load_msg,
         load_key_n => load_key_n,
         load_key_e => load_key_e,
-        operation_sel => operation_sel
+        start_monpro => start_monpro,
+        start_blakley => start_blakley,
+        output_result => output_result,
+        monpro_done => monpro_done,
+        blakley_done => blakley_done
     );
 
 datapath: entity work.Datapath
     port map (
+        clk => Clk,
+        reset_n => Resetn,
         data_in => DataIn,
         data_out => DataOut,
         load_msg => load_msg,
         load_key_n => load_key_n,
         load_key_e => load_key_e,
-        operation_sel => operation_sel
+        start_monpro => start_monpro,
+        start_blakley => start_blakley,
+        monpro_done => monpro_done,
+        blakley_done => blakley_done,
+        output_result => output_result
     );
 end Behavioral;
