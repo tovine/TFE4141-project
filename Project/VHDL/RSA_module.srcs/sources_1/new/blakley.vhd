@@ -35,7 +35,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity blakley is
     generic (OPERAND_WIDTH : integer := 128);
 
-    Port ( a : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+    Port ( a : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0); -- TODO: not needed, always 2^128
            b : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
            n : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
            p : out STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
@@ -75,7 +75,7 @@ begin
             else
                 --p_tmp <= shift_left(p_tmp, std_logic_vector(1));
                 p_tmp := p_tmp(OPERAND_WIDTH-2 DOWNTO 0) & "0";
-                should_add := a(OPERAND_WIDTH - 1 - counter);                
+                should_add := a(OPERAND_WIDTH - 1 - counter); -- TODO: can be greatly simplified as a will always be 2^128
                 if (should_add = '1') then
                     p_tmp := p_tmp + b;
                 end if;

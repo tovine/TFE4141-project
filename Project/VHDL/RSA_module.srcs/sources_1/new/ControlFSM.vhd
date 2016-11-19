@@ -52,8 +52,54 @@ entity ControlFSM is
 end ControlFSM;
 
 architecture Behavioral of ControlFSM is
-
+    type state is (IDLE, LOAD_CONFIG, LOAD_MESSAGE, RUN_BLAKLEY, RUN_MONPRO, OUTPUT_DATA);
+    signal curr_state, next_state : state;
+    signal substate_counter: integer range 0 to 7;
 begin
 
+StateProcess: process (curr_state, init_rsa, start_rsa, monpro_done, blakley_done, reset_n)
+begin
+    case (curr_state) is
+    when IDLE =>
+    -- TODO: does all the data-changing parts belong in the clocked process?
+        load_msg <= "0000";
+        load_key_n <= "0000";
+        load_key_e <= "0000";
+        output_result <= "0000";
+        start_monpro <= '0';
+        start_blakley <= '0';
+        core_finished <= '1';
+        if (init_rsa = '1') then
+            next_state <= LOAD_CONFIG;
+        elsif (init_rsa = '1') then
+            next_state <= LOAD_MESSAGE;
+        end if;
+        
+    when LOAD_CONFIG =>
+        -- TODO: load all config registers, in sequence KeyN[3..0], KeyE[3..0]
+        if (substate_counter = 7) then -- The last register has been loaded
+            next_state <= IDLE;
+            substate_counter <= 0; -- TODO: must this be done in sync?
+        end if;
+    when LOAD_MESSAGE =>
+        if (substate_counter = 7) then -- The last register has been loaded
+            next_state <= RUN_BLAKLEY;
+            substate_counter <= 0; -- TODO: must this be done in sync?
+        end if;
+    when RUN_BLAKLEY =>
+        if (blakley_done = '1') then
+            next_state <= RUN_MONPRO;
+        end if;
+    when RUN_MONPRO =>
+        if (monpro_done = '1') then
+            next_state <= OUTPUT_DATA;
+        end if;
+    when OUTPUT_DATA =>
+        if (substate_counter = 4) then -- TODO: should it be 3 instead?
+            next_state <= IDLE;
+        end if;
+    -- TODO: add 'otherwise' case?
+    end case;
+end process; 
 
 end Behavioral;
