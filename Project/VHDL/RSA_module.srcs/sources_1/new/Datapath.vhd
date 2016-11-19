@@ -89,6 +89,23 @@ blakley : entity work.blakley
         done => monpro_done
     );
     
+load_registers : process (clk, reset_n)
+begin
+    if (reset_n = '0') then -- Reset all registers to known default values
+        key_n <= (others => '0');
+        key_e <= (others => '0');
+        message <= (others => '0');
+        --operand_a <= (others => '0');
+        --operand_b <= (others => '0');
+        key_n <= (others => '0');
+        key_n <= (others => '0');
+        key_n <= (others => '0');
+        key_n <= (others => '0');
+        key_n <= (others => '0');
+    elsif (clk'event AND clk = '1') then
+    end if;
+end process;
+    
 --arithmetics : entity work.ALU
 --        port map (
 --            operand_a => operand_a,
