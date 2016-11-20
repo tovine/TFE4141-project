@@ -41,6 +41,7 @@ entity ControlFSM is
            load_msg : out STD_LOGIC_VECTOR (3 downto 0);
            load_key_n : out STD_LOGIC_VECTOR (3 downto 0);
            load_key_e : out STD_LOGIC_VECTOR (3 downto 0);
+           load_m_inverse : out STD_LOGIC; -- TODO: set this signal
            output_result : out STD_LOGIC_VECTOR (3 downto 0);
            start_monpro : out STD_LOGIC;
            start_blakley : out STD_LOGIC;
