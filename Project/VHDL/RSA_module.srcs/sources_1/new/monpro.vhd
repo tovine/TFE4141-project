@@ -72,6 +72,7 @@ begin
                 end if;
                 done <= '1';
                 counter <= 0;
+                running <= '0'; 
             else
                 should_add := a(counter);
                 if (should_add = '1') then

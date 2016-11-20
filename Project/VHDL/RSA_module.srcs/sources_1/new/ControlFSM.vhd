@@ -57,8 +57,31 @@ end ControlFSM;
 architecture Behavioral of ControlFSM is
     type state is (IDLE, LOAD_CONFIG, LOAD_MESSAGE, RUN_BLAKLEY, RUN_MONPRO, OUTPUT_DATA);
     signal curr_state, next_state : state;
-    signal substate_counter: integer range 0 to 7;
+    signal substate_counter: integer range 0 to 128;
 begin
+
+-- *********************************************************************
+-- Things to do in the different states:
+-- *********************************************************************
+-- LOAD_CONFIG:
+--  - load keys n and e
+--  - compute x_ (blakley using 2^128, 1 and n)
+--  - return to IDLE
+-- LOAD_MESSAGE:
+--  - Load the message (should take 4 cycles)
+--  - compute m_ (blakley using 2^128, message and n)
+--  - go to RUN_MONPRO
+-- RUN_MONPRO: TODO: rename this state?
+--  - Do the following 128 (or 127?) times:
+--    - start the monpro block using x_, x_ and n
+--    - if (bit i of key_e is 1): run monpro again using m_, x_ and n
+--  - start the monpro block using x_, 1 and n
+--  - go to OUTPUT_DATA
+-- OUTPUT_DATA:
+--  - Set core_finished to 1
+--  - For 4 clock periods, output a new 32-bit chunk of data
+--  - return to IDLE
+
 
 StateProcess: process (curr_state, init_rsa, start_rsa, monpro_done, blakley_done, reset_n)
 begin
@@ -74,7 +97,7 @@ begin
         core_finished <= '1';
         if (init_rsa = '1') then
             next_state <= LOAD_CONFIG;
-        elsif (init_rsa = '1') then
+        elsif (start_rsa = '1') then
             next_state <= LOAD_MESSAGE;
         end if;
         

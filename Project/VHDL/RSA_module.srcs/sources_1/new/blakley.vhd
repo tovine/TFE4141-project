@@ -68,6 +68,7 @@ begin
             if (counter = OPERAND_WIDTH+1) then    
                 done <= '1';
                 counter <= 0;
+                running <= '0';
             else
                 --p_tmp <= shift_left(p_tmp, std_logic_vector(1));
                 p_tmp := p_tmp(OPERAND_WIDTH-2 DOWNTO 0) & "0";
