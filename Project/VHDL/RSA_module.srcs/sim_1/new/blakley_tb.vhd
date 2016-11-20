@@ -40,6 +40,7 @@ architecture Behavioral of blakley_tb is
 
     signal Clk_tb : std_logic:='0';
     signal Reset_n_tb : std_logic:='1';
+    signal start_tb : std_logic:='0';
     signal done : std_logic;
     signal a_tb : std_logic_vector(OPERAND_WIDTH-1 downto 0);
     signal b_tb : std_logic_vector(OPERAND_WIDTH-1 downto 0);
@@ -49,11 +50,11 @@ architecture Behavioral of blakley_tb is
 begin
 DUT : entity work.blakley
     port map(
-        a => a_tb,
         b => b_tb,
         n => n_tb,
         p => p_tb,
         clk => Clk_tb,
+        start => start_tb,
         reset_n => Reset_n_tb,
         done => done
     );
@@ -71,7 +72,7 @@ DUT : entity work.blakley
     stim_proc: process
     begin
         Reset_n_tb <='0';
-                a_tb <= x"00000000000000000000000100000000";
+--                a_tb <= x"100000000000000000000000000000000";
 --                b_tb <= x"0000000000000000000000000aaabbbb";
 --                n_tb <= x"000000000000000000000000819dc6b2";
                 b_tb <= x"0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -80,6 +81,10 @@ DUT : entity work.blakley
 --        a_tb <= "0x0aaabbbb"; -- TODO: find good test stimuli
 --        b_tb <= "0x
           Reset_n_tb <= '1';
+        wait for 15 ns;
+            start_tb <= '1';
+        wait for 25 ns;
+            start_tb <= '0';
         wait for 20us;
         --wait for done = '1';
         -- Repeat

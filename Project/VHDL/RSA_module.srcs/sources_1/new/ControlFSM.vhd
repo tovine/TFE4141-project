@@ -42,7 +42,9 @@ entity ControlFSM is
            load_key_n : out STD_LOGIC_VECTOR (3 downto 0);
            load_key_e : out STD_LOGIC_VECTOR (3 downto 0);
            load_m_inverse : out STD_LOGIC; -- TODO: set this signal
-           output_result : out STD_LOGIC_VECTOR (3 downto 0);
+           load_x_inverse : out STD_LOGIC; -- TODO: set this signal
+           blakley_to_x_inverse : out STD_LOGIC; -- TODO: set this signal
+           select_output : out STD_LOGIC_VECTOR (1 downto 0);
            start_monpro : out STD_LOGIC;
            start_blakley : out STD_LOGIC;
            -- Status inputs from datapath
@@ -66,7 +68,7 @@ begin
         load_msg <= "0000";
         load_key_n <= "0000";
         load_key_e <= "0000";
-        output_result <= "0000";
+        select_output <= "00";
         start_monpro <= '0';
         start_blakley <= '0';
         core_finished <= '1';

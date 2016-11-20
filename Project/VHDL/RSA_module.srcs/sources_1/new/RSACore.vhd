@@ -46,12 +46,14 @@ architecture Behavioral of RSACore is
     signal load_msg : STD_LOGIC_VECTOR (3 downto 0);
     signal load_key_n : STD_LOGIC_VECTOR (3 downto 0);
     signal load_key_e : STD_LOGIC_VECTOR (3 downto 0);
-    signal output_result : STD_LOGIC_VECTOR (3 downto 0);
+    signal select_output : STD_LOGIC_VECTOR (1 downto 0);
     signal start_monpro : STD_LOGIC;
     signal start_blakley : STD_LOGIC;
     signal blakley_done : STD_LOGIC;
     signal monpro_done : STD_LOGIC;
     signal load_m_inverse : STD_LOGIC;
+    signal load_x_inverse : STD_LOGIC;
+    signal blakley_to_x_inverse : STD_LOGIC;
         
 begin
 control: entity work.ControlFSM
@@ -65,9 +67,11 @@ control: entity work.ControlFSM
         load_key_n => load_key_n,
         load_key_e => load_key_e,
         load_m_inverse => load_m_inverse,
+        blakley_to_x_inverse => blakley_to_x_inverse,
+        load_x_inverse => load_x_inverse,
         start_monpro => start_monpro,
         start_blakley => start_blakley,
-        output_result => output_result,
+        select_output => select_output,
         monpro_done => monpro_done,
         blakley_done => blakley_done
     );
@@ -81,11 +85,13 @@ datapath: entity work.Datapath
         load_msg => load_msg,
         load_key_n => load_key_n,
         load_key_e => load_key_e,
-        load_blakley_to_m_inverse => load_m_inverse,
+        load_blakley_to_msg => load_m_inverse,
+        load_blakley_to_x_inverse => blakley_to_x_inverse,
+        load_x_inverse => load_x_inverse,
         start_monpro => start_monpro,
         start_blakley => start_blakley,
         monpro_done => monpro_done,
         blakley_done => blakley_done,
-        output_result => output_result
+        select_output => select_output
     );
 end Behavioral;

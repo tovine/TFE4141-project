@@ -35,8 +35,7 @@ use IEEE.NUMERIC_STD.ALL;
 entity blakley is
     generic (OPERAND_WIDTH : integer := 128);
 
-    Port ( a : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0); -- TODO: not needed, always 2^128
-           b : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+    Port ( b : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
            n : in STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
            p : out STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
            clk : in STD_LOGIC;
@@ -46,37 +45,35 @@ entity blakley is
 end blakley;
 
 architecture Behavioral of blakley is
-    signal counter: INTEGER range 0 to OPERAND_WIDTH;-- (7 downto 0);
+    signal counter: INTEGER range 0 to OPERAND_WIDTH+1;-- (7 downto 0);
     signal running: std_logic;
+ --   signal a: STD_LOGIC_VECTOR (OPERAND_WIDTH downto 0) := x"10000000000000000"; -- = 2^128 TODO: simplify
 begin
 
-    process(start) -- simple process to start the blakley operation
-    begin
-        if (running = '0' AND start = '1') then -- TODO: replace runnig with done?
-            running <= '1';
-            done <= '0';
-        end if;
-    end process;
-    
-    process(clk, reset_n)
-        variable should_add : STD_LOGIC;
+    process(clk, reset_n, start)
+        --variable should_add : STD_LOGIC;
         variable p_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
     begin
-        should_add := '0';
+--        should_add := '0';
         if (reset_n = '0') then
             running <= '0';
             p_tmp := (others => '0');
-            counter <= 0;
             done <= '0';
-        elsif (running = '1' AND clk'EVENT AND clk='1') then
-            if (counter = OPERAND_WIDTH) then    
+        elsif (start = '1' AND running = '0') then
+            running <= '1';
+            done <= '0';
+            counter <= 0;
+        end if;
+        if (running = '1' AND clk'EVENT AND clk='1') then
+            if (counter = OPERAND_WIDTH+1) then    
                 done <= '1';
                 counter <= 0;
             else
                 --p_tmp <= shift_left(p_tmp, std_logic_vector(1));
                 p_tmp := p_tmp(OPERAND_WIDTH-2 DOWNTO 0) & "0";
-                should_add := a(OPERAND_WIDTH - 1 - counter); -- TODO: can be greatly simplified as a will always be 2^128
-                if (should_add = '1') then
+--                should_add := a(OPERAND_WIDTH - 1 - counter); -- TODO: can be greatly simplified as a will always be 2^128
+--                if (should_add = '1') then
+                if (counter = 0) then
                     p_tmp := p_tmp + b;
                 end if;
                 if ("0" & p_tmp(OPERAND_WIDTH-1 downto 1) > n) then

@@ -44,12 +44,14 @@ entity Datapath is
            load_msg : in STD_LOGIC_VECTOR (3 downto 0);
            load_key_n : in STD_LOGIC_VECTOR (3 downto 0);
            load_key_e : in STD_LOGIC_VECTOR (3 downto 0);
-           load_blakley_to_m_inverse : in STD_LOGIC;
+           load_blakley_to_msg : in STD_LOGIC;
+           load_blakley_to_x_inverse : in STD_LOGIC;
+           load_x_inverse : in STD_LOGIC;
            start_monpro : in STD_LOGIC;
            start_blakley : in STD_LOGIC;
            monpro_done : out STD_LOGIC;
            blakley_done : out STD_LOGIC;
-           output_result : in STD_LOGIC_VECTOR (3 downto 0)
+           select_output : in STD_LOGIC_VECTOR (1 downto 0)
          );
 end Datapath;
 
@@ -57,14 +59,24 @@ architecture Behavioral of Datapath is
     signal key_n : STD_LOGIC_VECTOR (127 downto 0);
     signal key_e : STD_LOGIC_VECTOR (127 downto 0);
     signal message : STD_LOGIC_VECTOR (127 downto 0);
-    signal operand_a : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0);
-    signal operand_b : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0);
-    signal message_chunk_ret : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0);
-    signal m_inverse : STD_LOGIC_VECTOR (127 downto 0);
+    signal msg_0 : STD_LOGIC_VECTOR ( 31 downto 0);
+    signal msg_1 : STD_LOGIC_VECTOR ( 31 downto 0);
+    signal msg_2 : STD_LOGIC_VECTOR ( 31 downto 0);
+    signal msg_3 : STD_LOGIC_VECTOR ( 31 downto 0);
+    signal load_msg_0 : STD_LOGIC;
+    signal load_msg_1 : STD_LOGIC;
+    signal load_msg_2 : STD_LOGIC;
+    signal load_msg_3 : STD_LOGIC;
+    signal operand_a : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0); -- x_inverse or m_inverse
+    signal operand_b : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0); -- 
+    
+--    signal message_chunk_ret : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0);
     signal x_inverse : STD_LOGIC_VECTOR (127 downto 0);
+    signal x_inverse_next : STD_LOGIC_VECTOR (127 downto 0);
     signal monpro_result : STD_LOGIC_VECTOR (127 downto 0);
     signal blakley_result : STD_LOGIC_VECTOR (127 downto 0);
 begin
+
 monpro : entity work.monpro
     port map(
         a => operand_a,
@@ -79,7 +91,6 @@ monpro : entity work.monpro
     
 blakley : entity work.blakley
     port map(
-        a => operand_a,
         b => operand_b,
         n => key_n,
         p => blakley_result,
@@ -89,6 +100,57 @@ blakley : entity work.blakley
         done => blakley_done
     );
 
+-- Route the correct input to the x_ register
+select_x_inverse_input : process (load_blakley_to_x_inverse)
+begin
+    if (load_blakley_to_x_inverse = '1') then
+        x_inverse_next <= blakley_result;
+    else
+        x_inverse_next <= monpro_result;
+    end if;
+end process;
+
+-- Route the correct input to the message registers
+select_message_input : process (load_blakley_to_msg)
+begin
+    if (load_blakley_to_msg = '1') then
+        msg_3 <= blakley_result(127 downto 96);
+        msg_2 <= blakley_result(95 downto 64);
+        msg_1 <= blakley_result(63 downto 32);
+        msg_0 <= blakley_result(31 downto 0);        
+    else
+        msg_3 <= data_in;
+        msg_2 <= data_in;
+        msg_1 <= data_in;
+        msg_0 <= data_in;
+    end if;
+end process;
+
+-- In case load_blakley_to_msg is used, one shouldn't have to activate all load_msg signals
+load_msg_0 <= load_msg(0) OR load_blakley_to_msg;
+load_msg_1 <= load_msg(1) OR load_blakley_to_msg;
+load_msg_2 <= load_msg(2) OR load_blakley_to_msg;
+load_msg_3 <= load_msg(3) OR load_blakley_to_msg;   
+
+-- Route the correct 32 bits to the output
+select_output_register : process (clk, select_output)
+begin
+if (clk'event AND clk = '1') then
+    case(select_output) is
+    when "11" =>
+        data_out <= monpro_result(127 downto 96);
+    when "10" =>
+        data_out <= monpro_result(95 downto 64);
+    when "01" =>
+        data_out <= monpro_result(63 downto 32);
+    when "00" =>
+        data_out <= monpro_result(31 downto 0);
+    end case;
+end if;
+end process;
+
+--select_operand_process : process (
+
 -- *************************************************************
 -- Register declarations follow    
 -- *************************************************************
@@ -97,8 +159,8 @@ reg_msg0 : entity work.register_enable_reset_n
     port map(
         clk => clk,
         reset_n => reset_n,
-        en => load_msg(0),
-        d => data_in,
+        en => load_msg_0,
+        d => msg_0,
         q => message(31 downto 0)
     );
     
@@ -106,8 +168,8 @@ reg_msg1 : entity work.register_enable_reset_n
     port map(
         clk => clk,
         reset_n => reset_n,
-        en => load_msg(1),
-        d => data_in,
+        en => load_msg_1,
+        d => msg_1,
         q => message(63 downto 32)
     );
 
@@ -115,8 +177,8 @@ reg_msg2 : entity work.register_enable_reset_n
     port map(
         clk => clk,
         reset_n => reset_n,
-        en => load_msg(2),
-        d => data_in,
+        en => load_msg_2,
+        d => msg_2,
         q => message(95 downto 64)
     );
     
@@ -124,8 +186,8 @@ reg_msg3 : entity work.register_enable_reset_n
     port map(
         clk => clk,
         reset_n => reset_n,
-        en => load_msg(3),
-        d => data_in,
+        en => load_msg_3,
+        d => msg_3,
         q => message(127 downto 96)
     );
     
@@ -203,6 +265,26 @@ reg_key_e3 : entity work.register_enable_reset_n
         q => key_e(127 downto 96)
     );
 
+--reg_m_inverse : entity work.register_enable_reset_n
+--    generic map(REGISTER_WIDTH => 128)
+--    port map(
+--        clk => clk,
+--        reset_n => reset_n,
+--        en => load_blakley_to_msg,
+--        d => blakley_result,
+--        q => m_inverse
+--    );
+
+reg_x_inverse : entity work.register_enable_reset_n
+        generic map(REGISTER_WIDTH => 128)
+        port map(
+            clk => clk,
+            reset_n => reset_n,
+            en => load_x_inverse,
+            d => x_inverse_next,
+            q => x_inverse
+        );
+
 --load_registers : process (clk, reset_n)
 --begin
 --    if (reset_n = '0') then -- Reset all registers to known default values
@@ -218,49 +300,7 @@ reg_key_e3 : entity work.register_enable_reset_n
 --        blakley_result <= (others => '0');
 --    elsif (clk'event AND clk = '1') then
 --        --Load the various registers based on the incoming control signals
-----        case (load_msg) is -- message
-----        when "1000" =>
-----        if (load_msg = "1XXX") then
-----            message((127-32*0) downto (32*3)) <= data_in;
-----        elsif (load_msg = "X1XX") then
-------        when "0100" =>
-----            message((127-32*1) downto (32*2)) <= data_in;
-----        elsif (load_msg = "XX1X") then
-------        when "0010" =>
-----            message((127-32*2) downto (32*1)) <= data_in;
-----        elsif (load_msg = "XXX1") then
-------        when "0001" =>
-----            message((127-32*3) downto (32*0)) <= data_in;
-----        else
-------        when others =>
-----            message <= message;
-------        end case;
-----        end if;
-----        case (load_key_n) is -- key_n
-----        when "1000" =>
-----            key_n((127-32*0) downto (32*3)) <= data_in;
-----        when "0100" =>
-----            key_n((127-32*1) downto (32*2)) <= data_in;
-----        when "0010" =>
-----            key_n((127-32*2) downto (32*1)) <= data_in;
-----        when "0001" =>
-----            key_n((127-32*3) downto (32*0)) <= data_in;
-----        when others =>
-----            key_n <= key_n;
-----        end case;
---        case (load_key_e) is -- key_e
---        when "1000" =>
---            key_e((127-32*0) downto (32*3)) <= data_in;
---        when "0100" =>
---            key_e((127-32*1) downto (32*2)) <= data_in;
---        when "0010" =>
---            key_e((127-32*2) downto (32*1)) <= data_in;
---        when "0001" =>
---            key_e((127-32*3) downto (32*0)) <= data_in;
---        when others =>
---            key_e <= key_e;
---        end case;
---        case (output_result) is -- result chunk to output
+--        case (select_output) is -- result chunk to output
 --        when "1000" =>
 --            data_out <= message_chunk_ret((127-32*0) downto (32*3));
 --        when "0100" =>
@@ -273,7 +313,7 @@ reg_key_e3 : entity work.register_enable_reset_n
 --            data_out <= (others => '0');
 --        end case;
 --        -- Load the result of blakley
---        if (load_blakley_to_m_inverse = '1') then
+--        if (load_blakley_to_msg = '1') then
 --            m_inverse <= blakley_result;
 --        end if; 
 

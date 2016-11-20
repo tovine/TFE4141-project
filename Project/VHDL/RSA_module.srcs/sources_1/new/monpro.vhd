@@ -50,16 +50,8 @@ architecture Behavioral of monpro is
     signal counter: INTEGER range 0 to OPERAND_WIDTH;-- (7 downto 0);
     signal running: std_logic;
 begin
-
-    process(start) -- simple process to start the operation
-    begin
-        if (running = '0' AND start = '1') then -- TODO: replace runnig with done?
-            running <= '1';
-            done <= '0';
-        end if;
-    end process;
     
-    process(clk, reset_n)
+    process(clk, reset_n, start)
         variable should_add : STD_LOGIC;
         variable result_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
     begin
@@ -69,7 +61,11 @@ begin
             result_tmp := (others => '0');
             counter <= 0;
             done <= '0';
-        elsif (running = '1' AND clk'event AND clk = '1') then
+        elsif (start = '1') then
+            running <= '1';
+            done <= '0';
+        end if;
+        if (running = '1' AND clk'event AND clk = '1') then
             if (counter = OPERAND_WIDTH) then -- Done computing, reduce result and return
                 if (result_tmp >= n) then
                     result_tmp := result_tmp - n;
@@ -87,7 +83,8 @@ begin
                 result_tmp := ("0" & result_tmp(OPERAND_WIDTH-1 downto 1)); -- right shift by one
                 counter <= counter + 1;
             end if;
-        end if; -- clock edge
+        end if;
+        
         result <= result_tmp(OPERAND_WIDTH-1 downto 0);
     end process;
 
