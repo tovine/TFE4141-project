@@ -46,6 +46,9 @@ entity Datapath is
            load_key_e : in STD_LOGIC_VECTOR (3 downto 0);
            load_blakley_to_msg : in STD_LOGIC;
            load_blakley_to_x_inverse : in STD_LOGIC;
+           select_blakley_input : in STD_LOGIC;
+           select_monpro_input_1 : in STD_LOGIC;
+           select_monpro_input_2 : in STD_LOGIC;
            load_x_inverse : in STD_LOGIC;
            start_monpro : in STD_LOGIC;
            start_blakley : in STD_LOGIC;
@@ -67,8 +70,9 @@ architecture Behavioral of Datapath is
     signal load_msg_1 : STD_LOGIC;
     signal load_msg_2 : STD_LOGIC;
     signal load_msg_3 : STD_LOGIC;
-    signal operand_a : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0); -- x_inverse or m_inverse
-    signal operand_b : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0); -- 
+    signal operand_a : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0);
+    signal operand_b : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0); 
+    signal blakley_input : STD_LOGIC_VECTOR (127 downto 0);
     
 --    signal message_chunk_ret : STD_LOGIC_VECTOR (ADDER_WIDTH-1 downto 0);
     signal x_inverse : STD_LOGIC_VECTOR (127 downto 0);
@@ -91,7 +95,7 @@ monpro : entity work.monpro
     
 blakley : entity work.blakley
     port map(
-        b => operand_b,
+        b => blakley_input,
         n => key_n,
         p => blakley_result,
         clk => clk,
@@ -109,6 +113,34 @@ begin
         x_inverse_next <= monpro_result;
     end if;
 end process;
+
+-- Select the correct input for blakley
+blakley_input_proc : process (select_blakley_input)
+begin
+    if (select_blakley_input = '1') then
+        blakley_input(0) <= '1';
+        blakley_input(127 downto 1) <= (others => '0');
+    else
+        blakley_input <= message;
+    end if;
+end process;
+
+-- Select the correct input for monpro
+monpro_input_proc : process (select_monpro_input_1, select_monpro_input_2)
+begin
+    if (select_monpro_input_1 = '1') then
+        operand_a <= message;
+    else
+        operand_a <= x_inverse;
+    end if;
+    if (select_monpro_input_2 = '1') then
+        operand_b(0) <= '1';
+        operand_b(127 downto 1) <= (others => '0');
+    else
+        operand_b <= x_inverse;
+    end if;
+end process;
+
 
 -- Route the correct input to the message registers
 select_message_input : process (load_blakley_to_msg)
@@ -148,8 +180,6 @@ if (clk'event AND clk = '1') then
     end case;
 end if;
 end process;
-
---select_operand_process : process (
 
 -- *************************************************************
 -- Register declarations follow    

@@ -41,9 +41,12 @@ entity ControlFSM is
            load_msg : out STD_LOGIC_VECTOR (3 downto 0);
            load_key_n : out STD_LOGIC_VECTOR (3 downto 0);
            load_key_e : out STD_LOGIC_VECTOR (3 downto 0);
-           load_m_inverse : out STD_LOGIC; -- TODO: set this signal
-           load_x_inverse : out STD_LOGIC; -- TODO: set this signal
-           blakley_to_x_inverse : out STD_LOGIC; -- TODO: set this signal
+           load_m_inverse : out STD_LOGIC;
+           load_x_inverse : out STD_LOGIC;
+           select_blakley_input : out STD_LOGIC;
+           select_monpro_input_1 : out STD_LOGIC;
+           select_monpro_input_2 : out STD_LOGIC;
+           blakley_to_x_inverse : out STD_LOGIC;
            select_output : out STD_LOGIC_VECTOR (1 downto 0);
            start_monpro : out STD_LOGIC;
            start_blakley : out STD_LOGIC;
@@ -56,9 +59,49 @@ end ControlFSM;
 
 architecture Behavioral of ControlFSM is
     type state is (IDLE, LOAD_CONFIG, LOAD_MESSAGE, RUN_BLAKLEY, RUN_MONPRO, OUTPUT_DATA);
-    signal curr_state, next_state : state;
+    signal current_state, next_state : state;
     signal substate_counter: integer range 0 to 128;
 begin
+
+
+StateProcess: process (current_state, init_rsa, start_rsa, monpro_done, blakley_done, reset_n)
+begin
+    if (reset_n = '0') then
+        next_state <= IDLE;
+    else
+        case (current_state) is
+        when IDLE =>
+            if (init_rsa = '1') then
+                next_state <= LOAD_CONFIG;
+            elsif (start_rsa = '1') then
+                next_state <= LOAD_MESSAGE;
+            end if;
+            
+        when LOAD_CONFIG =>
+            if (blakley_done = '1') then -- The last register has been loaded
+                next_state <= IDLE;
+                substate_counter <= 0; -- TODO: must this be done in sync?
+            end if;
+        when LOAD_MESSAGE =>
+            if (substate_counter = 7) then -- The last register has been loaded
+                next_state <= RUN_BLAKLEY;
+            end if;
+        when RUN_BLAKLEY =>
+            if (blakley_done = '1') then
+                next_state <= RUN_MONPRO;
+            end if;
+        when RUN_MONPRO =>
+            if (monpro_done = '1') then
+                next_state <= OUTPUT_DATA;
+            end if;
+        when OUTPUT_DATA =>
+            if (substate_counter = 4) then -- TODO: should it be 3 instead?
+                next_state <= IDLE;
+            end if;
+        -- TODO: add 'otherwise' case?
+        end case;
+    end if;
+end process; 
 
 -- *********************************************************************
 -- Things to do in the different states:
@@ -82,12 +125,11 @@ begin
 --  - For 4 clock periods, output a new 32-bit chunk of data
 --  - return to IDLE
 
-
-StateProcess: process (curr_state, init_rsa, start_rsa, monpro_done, blakley_done, reset_n)
+SynchronousProcess: process(clk, reset_n)
+    variable increment_substate: std_logic;
 begin
-    case (curr_state) is
-    when IDLE =>
-    -- TODO: does all the data-changing parts belong in the clocked process?
+    increment_substate := '0';
+    if (reset_n = '0') then
         load_msg <= "0000";
         load_key_n <= "0000";
         load_key_e <= "0000";
@@ -95,37 +137,125 @@ begin
         start_monpro <= '0';
         start_blakley <= '0';
         core_finished <= '1';
-        if (init_rsa = '1') then
-            next_state <= LOAD_CONFIG;
-        elsif (start_rsa = '1') then
-            next_state <= LOAD_MESSAGE;
-        end if;
-        
+        substate_counter <= 0;
+    end if;
+    case (current_state) is
+    when IDLE =>
+        load_msg <= "0000";
+        load_key_n <= "0000";
+        load_key_e <= "0000";
+        select_output <= "00";
+        start_monpro <= '0';
+        start_blakley <= '0';
+        core_finished <= '1';
+        substate_counter <= 0;
     when LOAD_CONFIG =>
-        -- TODO: load all config registers, in sequence KeyN[3..0], KeyE[3..0]
-        if (substate_counter = 7) then -- The last register has been loaded
-            next_state <= IDLE;
-            substate_counter <= 0; -- TODO: must this be done in sync?
-        end if;
+        increment_substate := '1';
+        case (substate_counter) is
+        when 0 =>
+            load_key_e <= "0001";
+            load_key_n <= "0000";
+        when 1 =>
+            load_key_e <= "0010";
+            load_key_n <= "0000";
+        when 2 =>
+            load_key_e <= "0100";
+            load_key_n <= "0000";
+        when 3 =>
+            load_key_e <= "1000";
+            load_key_n <= "0000";
+        when 4 =>
+            load_key_n <= "0001";
+            load_key_e <= "0000";
+        when 5 =>
+            load_key_n <= "0010";
+            load_key_e <= "0000";
+        when 6 =>
+            load_key_n <= "0100";
+            load_key_e <= "0000";
+        when 7 =>
+            load_key_n <= "1000";
+            load_key_e <= "0000";
+        when 8 =>
+            load_key_e <= "0000";
+            load_key_n <= "0000";
+            select_blakley_input <= '1';
+            start_blakley <= '1';
+        when others =>
+            select_blakley_input <= '1';
+            blakley_to_x_inverse <= '1';
+            load_key_e <= "0000";
+            load_key_n <= "0000";
+            start_blakley <= '0';
+            increment_substate := '0';
+        end case; -- LOAD_CONFIG
     when LOAD_MESSAGE =>
-        if (substate_counter = 7) then -- The last register has been loaded
-            next_state <= RUN_BLAKLEY;
-            substate_counter <= 0; -- TODO: must this be done in sync?
-        end if;
-    when RUN_BLAKLEY =>
-        if (blakley_done = '1') then
-            next_state <= RUN_MONPRO;
-        end if;
+        increment_substate := '1';
+        case (substate_counter) is
+        when 0 =>
+            load_msg <= "0001";
+        when 1 =>
+            load_msg <= "0010";
+        when 2 =>
+            load_msg <= "0100";
+        when 3 =>
+            load_msg <= "1000";
+        when 4 => 
+            load_msg <= "0000";
+            start_blakley <= '1';
+        when others =>
+            start_blakley <= '0';
+            increment_substate := '0';
+            if (blakley_done = '1') then
+                -- Once the first blakley run completes, load the result into the msg registers
+                load_m_inverse <= '1';
+                next_state <= RUN_MONPRO;
+            end if;
+        end case; -- LOAD_MESSAGE
     when RUN_MONPRO =>
-        if (monpro_done = '1') then
+    -- RUN_MONPRO: TODO: rename this state?
+    --  - Do the following 128 (or 127?) times:
+    --    - start the monpro block using x_, x_ and n
+    --    - if (bit i of key_e is 1): run monpro again using m_, x_ and n
+    --  - start the monpro block using x_, 1 and n
+    --  - go to OUTPUT_DATA
+        if (substate_counter = 128) then
+            select_monpro_input_2 <= '1';
+            start_monpro <= '1';
+            substate_counter <= substate_counter + 1;
+        elsif (monpro_done = '1' AND substate_counter = 129) then
             next_state <= OUTPUT_DATA;
+        elsif (monpro_done = '1' OR substate_counter = 0) then
+            start_monpro <= '1';
+            substate_counter <= substate_counter + 1;
         end if;
     when OUTPUT_DATA =>
-        if (substate_counter = 4) then -- TODO: should it be 3 instead?
+        -- TODO
+        core_finished <= '1';
+        increment_substate := '1';
+        case (substate_counter) is
+        when 0 =>
+            select_output <= "00";
+        when 1 =>
+            select_output <= "01";
+        when 2 =>
+            select_output <= "10";
+        when 3 =>
+            select_output <= "11";
+        when others => 
             next_state <= IDLE;
-        end if;
-    -- TODO: add 'otherwise' case?
-    end case;
-end process; 
+        end case;
+    when others =>
+        -- Should never get here, something's wrong
+        next_state <= IDLE;
+    end case; -- current_state
+    if (increment_substate = '1') then
+        substate_counter <= substate_counter + 1;
+    end if;
+    if (current_state /= next_state) then -- Make sure to reset the substate counter when changing states
+        substate_counter <= 0;
+    end if;
+    current_state <= next_state;
+end process;
 
 end Behavioral;

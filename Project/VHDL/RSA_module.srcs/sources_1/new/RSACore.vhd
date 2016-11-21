@@ -49,6 +49,9 @@ architecture Behavioral of RSACore is
     signal select_output : STD_LOGIC_VECTOR (1 downto 0);
     signal start_monpro : STD_LOGIC;
     signal start_blakley : STD_LOGIC;
+    signal select_blakley_input : STD_LOGIC;
+    signal select_monpro_input_1 : STD_LOGIC;
+    signal select_monpro_input_2 : STD_LOGIC;
     signal blakley_done : STD_LOGIC;
     signal monpro_done : STD_LOGIC;
     signal load_m_inverse : STD_LOGIC;
@@ -68,6 +71,9 @@ control: entity work.ControlFSM
         load_key_e => load_key_e,
         load_m_inverse => load_m_inverse,
         blakley_to_x_inverse => blakley_to_x_inverse,
+        select_blakley_input => select_blakley_input,
+        select_monpro_input_1 => select_monpro_input_1,
+        select_monpro_input_2 => select_monpro_input_2,
         load_x_inverse => load_x_inverse,
         start_monpro => start_monpro,
         start_blakley => start_blakley,
@@ -87,6 +93,9 @@ datapath: entity work.Datapath
         load_key_e => load_key_e,
         load_blakley_to_msg => load_m_inverse,
         load_blakley_to_x_inverse => blakley_to_x_inverse,
+        select_blakley_input => select_blakley_input,
+        select_monpro_input_1 => select_monpro_input_1,
+        select_monpro_input_2 => select_monpro_input_2,
         load_x_inverse => load_x_inverse,
         start_monpro => start_monpro,
         start_blakley => start_blakley,
