@@ -50,17 +50,18 @@ def monpro(a,b,n):
 		#u=u+a[i]*b
 		if getBitAt(a,i):
 			u = u + b
-		print(bin(u))
+#		print(bin(u))
 
 		if getBitAt(u,0):
 			u=u+n
-		print(bin(u))
+#		print(bin(u))
 		u=u>>1
-		print(bin(u))
-		print('i:', i, 'b:', b, 'u:',u)
+#		print(bin(u))
+		print('i:', i, 'b:', hex(b), 'u:',hex(u))
 	if (u >= n):
 		u = u - n
 #	print('i:', i, 'b:', b, 'u:',u)
+	print('Final result:',hex(u))
 	return u
 
 def modexp(m,e,n,r):
@@ -70,15 +71,15 @@ def modexp(m,e,n,r):
 	#m_ = blakley(m,r,n)
         #m_ = blakley(r,m,n)
 	#x_= blakley(r,0x1,n) # = R*mod(n)
+	x_= blakley(2**128,0x1,n) # = R*mod(n)
         # !!!! YHY
 	m_ = blakley(2**128,m,n) # r = 2^k = 2^128 always
         # !!!! YHY
-	x_= blakley(2**128,0x1,n) # = R*mod(n)
 	#x_= blakley(0x1,r,n)
 	print(m_,x_)
 	# !!!! YHY
         #for i in range(k,0,-1): # If k=5, then this line will iterate through 5,4,3,2,1. Not 4,3,2,1,0
-        # !!!! YHY
+        # !!!! YHY -- done until here
         for i in range(k-1,-1,-1):
 		x_=monpro(x_,x_,n)
 		print('x_: ',hex(x_))
@@ -90,14 +91,14 @@ def modexp(m,e,n,r):
 
 print("sys.argv length:", len(sys.argv), sys.argv)
 if len(sys.argv) is 5:
-	if re.match("[0-9]*", sys.argv[1]):
-		# We can assume that all input are numeric - run modexp with the given arguments
-		result = modexp(int(sys.argv[1],0), int(sys.argv[2],0), int(sys.argv[3],0), int(sys.argv[4],0))
-		print(result, hex(result))
-	elif sys.argv[1] == 'b':
+	if sys.argv[1] == 'b':
 		print(blakley(int(sys.argv[2],0), int(sys.argv[3],0), int(sys.argv[4],0)))
 	elif sys.argv[1] == 'mp':
 		print(monpro(int(sys.argv[2],0), int(sys.argv[3],0), int(sys.argv[4],0)))
+	elif re.match("[0-9]*", sys.argv[1]):
+		# We can assume that all input are numeric - run modexp with the given arguments
+		result = modexp(int(sys.argv[1],0), int(sys.argv[2],0), int(sys.argv[3],0), int(sys.argv[4],0))
+		print(result, hex(result))
 
 elif len(sys.argv) is 4:
 	if sys.argv[1] == 'gba':
