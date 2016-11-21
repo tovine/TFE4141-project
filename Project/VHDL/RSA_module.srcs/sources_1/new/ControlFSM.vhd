@@ -66,45 +66,6 @@ architecture Behavioral of ControlFSM is
     signal monpro_second_round: std_logic;
 begin
 
-StateProcess: process (current_state, init_rsa, start_rsa, monpro_done, blakley_done, reset_n)
-begin
-    if (reset_n = '0') then
-        next_state <= IDLE;
-    else
-        case (current_state) is
-        when IDLE =>
-            if (init_rsa = '1') then
-                next_state <= LOAD_CONFIG;
-            elsif (start_rsa = '1') then
-                next_state <= LOAD_MESSAGE;
-            end if;
-            
-        when LOAD_CONFIG =>
-            if (blakley_done = '1') then -- The last register has been loaded
-                next_state <= IDLE;
-                substate_counter <= 0; -- TODO: must this be done in sync?
-            end if;
-        when LOAD_MESSAGE =>
-            if (substate_counter = 7) then -- The last register has been loaded
-                next_state <= RUN_BLAKLEY;
-            end if;
-        when RUN_BLAKLEY =>
-            if (blakley_done = '1') then
-                next_state <= RUN_MONPRO;
-            end if;
-        when RUN_MONPRO =>
-            if (monpro_done = '1') then
-                next_state <= OUTPUT_DATA;
-            end if;
-        when OUTPUT_DATA =>
-            if (substate_counter = 4) then -- TODO: should it be 3 instead?
-                next_state <= IDLE;
-            end if;
-        -- TODO: add 'otherwise' case?
-        end case;
-    end if;
-end process; 
-
 -- *********************************************************************
 -- Things to do in the different states:
 -- *********************************************************************
@@ -143,6 +104,7 @@ begin
         start_blakley <= '0';
         core_finished <= '1';
         substate_counter <= 0;
+        next_state <= IDLE;
     end if;
     case (current_state) is
     when IDLE =>
@@ -154,6 +116,12 @@ begin
         start_blakley <= '0';
         core_finished <= '1';
         substate_counter <= 0;
+        if (init_rsa = '1') then
+            next_state <= LOAD_CONFIG;
+        elsif (start_rsa = '1') then
+            next_state <= LOAD_MESSAGE;
+        end if;
+
     when LOAD_CONFIG =>
         increment_substate := '1';
         case (substate_counter) is
@@ -193,7 +161,12 @@ begin
             load_key_n <= "0000";
             start_blakley <= '0';
             increment_substate := '0';
-        end case; -- LOAD_CONFIG
+        end case;
+        if (blakley_done = '1') then -- The last register has been loaded
+            next_state <= IDLE;
+            substate_counter <= 0; -- TODO: must this be done in sync?
+        end if;
+    -- LOAD_CONFIG
     when LOAD_MESSAGE =>
         increment_substate := '1';
         case (substate_counter) is

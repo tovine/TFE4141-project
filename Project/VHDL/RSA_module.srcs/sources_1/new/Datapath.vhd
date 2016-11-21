@@ -187,7 +187,7 @@ if (clk'event AND clk = '1') then
         data_out <= monpro_result(95 downto 64);
     when "01" =>
         data_out <= monpro_result(63 downto 32);
-    when "00" =>
+    when others => -- "00"
         data_out <= monpro_result(31 downto 0);
     end case;
 end if;
