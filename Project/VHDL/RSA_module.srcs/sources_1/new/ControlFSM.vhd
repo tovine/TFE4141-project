@@ -50,9 +50,11 @@ entity ControlFSM is
            select_output : out STD_LOGIC_VECTOR (1 downto 0);
            start_monpro : out STD_LOGIC;
            start_blakley : out STD_LOGIC;
+           current_e_bit : out INTEGER range 0 to 127;
            -- Status inputs from datapath
            monpro_done : in STD_LOGIC;
-           blakley_done : in STD_LOGIC
+           blakley_done : in STD_LOGIC;
+           current_e_bit_is_high : in STD_LOGIC
     );
 
 end ControlFSM;
@@ -61,8 +63,8 @@ architecture Behavioral of ControlFSM is
     type state is (IDLE, LOAD_CONFIG, LOAD_MESSAGE, RUN_BLAKLEY, RUN_MONPRO, OUTPUT_DATA);
     signal current_state, next_state : state;
     signal substate_counter: integer range 0 to 255;
+    signal monpro_second_round: std_logic;
 begin
-
 
 StateProcess: process (current_state, init_rsa, start_rsa, monpro_done, blakley_done, reset_n)
 begin
@@ -127,8 +129,11 @@ end process;
 
 SynchronousProcess: process(clk, reset_n)
     variable increment_substate: std_logic;
+    variable key_e_bit_high : std_logic;
 begin
     increment_substate := '0';
+    monpro_second_round <= '0'; -- TODO: this should work
+    current_e_bit <= substate_counter; -- TODO: substate_counter + 1?
     if (reset_n = '0') then
         load_msg <= "0000";
         load_key_n <= "0000";
@@ -219,15 +224,25 @@ begin
     --    - if (bit i of key_e is 1): run monpro again using m_, x_ and n
     --  - start the monpro block using x_, 1 and n
     --  - go to OUTPUT_DATA
-        if (substate_counter = 128) then
+        if (substate_counter = 128) then -- TODO: 129 instead?
             select_monpro_input_2 <= '1';
             start_monpro <= '1';
             substate_counter <= substate_counter + 1;
-        elsif (monpro_done = '1' AND substate_counter = 129) then
+        elsif (monpro_done = '1' AND substate_counter = 129) then -- TODO: 130 instead?
             next_state <= OUTPUT_DATA;
         elsif (monpro_done = '1' OR substate_counter = 0) then
             start_monpro <= '1';
-            substate_counter <= substate_counter + 1;
+            if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
+                select_monpro_input_1 <= '1';
+                monpro_second_round <= '0';
+            else
+                select_monpro_input_1 <= '0';
+                if (current_e_bit_is_high = '1' and monpro_second_round = '0') then
+                    monpro_second_round <= '1';
+                else
+                    substate_counter <= substate_counter + 1;
+                end if;
+            end if;
         end if;
     when OUTPUT_DATA =>
         -- TODO

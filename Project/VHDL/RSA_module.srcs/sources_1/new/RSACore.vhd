@@ -57,6 +57,8 @@ architecture Behavioral of RSACore is
     signal load_m_inverse : STD_LOGIC;
     signal load_x_inverse : STD_LOGIC;
     signal blakley_to_x_inverse : STD_LOGIC;
+    signal current_e_bit : INTEGER range 0 to 127;
+    signal e_bit_is_high : STD_LOGIC;
         
 begin
 control: entity work.ControlFSM
@@ -78,8 +80,10 @@ control: entity work.ControlFSM
         start_monpro => start_monpro,
         start_blakley => start_blakley,
         select_output => select_output,
+        current_e_bit => current_e_bit,
         monpro_done => monpro_done,
-        blakley_done => blakley_done
+        blakley_done => blakley_done,
+        current_e_bit_is_high => e_bit_is_high
     );
 
 datapath: entity work.Datapath
@@ -96,11 +100,13 @@ datapath: entity work.Datapath
         select_blakley_input => select_blakley_input,
         select_monpro_input_1 => select_monpro_input_1,
         select_monpro_input_2 => select_monpro_input_2,
+        current_e_bit => current_e_bit,
         load_x_inverse => load_x_inverse,
         start_monpro => start_monpro,
         start_blakley => start_blakley,
         monpro_done => monpro_done,
         blakley_done => blakley_done,
+        key_e_bit_is_high => e_bit_is_high,
         select_output => select_output
     );
 end Behavioral;

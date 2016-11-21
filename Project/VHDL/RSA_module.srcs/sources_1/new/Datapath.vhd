@@ -21,7 +21,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
 --use IEEE.NUMERIC_STD.ALL;
@@ -37,10 +37,13 @@ entity Datapath is
         ADDER_WIDTH : integer := 128 -- 32
     );
 
-    Port ( clk : in STD_LOGIC;
+    Port ( -- Clock and reset signals
+           clk : in STD_LOGIC;
            reset_n : in STD_LOGIC;
+           -- Data busses
            data_in : in STD_LOGIC_VECTOR (31 downto 0);
            data_out : out STD_LOGIC_VECTOR (31 downto 0);
+           -- Control signals from state machine
            load_msg : in STD_LOGIC_VECTOR (3 downto 0);
            load_key_n : in STD_LOGIC_VECTOR (3 downto 0);
            load_key_e : in STD_LOGIC_VECTOR (3 downto 0);
@@ -52,9 +55,12 @@ entity Datapath is
            load_x_inverse : in STD_LOGIC;
            start_monpro : in STD_LOGIC;
            start_blakley : in STD_LOGIC;
+           select_output : in STD_LOGIC_VECTOR (1 downto 0);
+           current_e_bit : in INTEGER range 0 to 127;
+           -- Status feedback to state machine
            monpro_done : out STD_LOGIC;
            blakley_done : out STD_LOGIC;
-           select_output : in STD_LOGIC_VECTOR (1 downto 0)
+           key_e_bit_is_high : out STD_LOGIC
          );
 end Datapath;
 
@@ -103,6 +109,12 @@ blakley : entity work.blakley
         start => start_blakley,
         done => blakley_done
     );
+    
+-- Return the selected but from key_e
+get_e_bit : process (current_e_bit)
+begin
+    key_e_bit_is_high <= key_e(current_e_bit);
+end process;
 
 -- Route the correct input to the x_ register
 select_x_inverse_input : process (load_blakley_to_x_inverse)
