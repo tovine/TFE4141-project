@@ -32,7 +32,8 @@ architecture struct of RSACoreTestBench is
   signal  CoreFinished     :  std_logic;  
   
   type   ComFileType  is array(natural range <>) of std_logic_vector(15 downto 0);
-  constant ComFileName : string :="ComFile.txt";  
+  --constant ComFileName : string :="ComFile.txt";
+  constant ComFileName : string :="C:\Prosjekter\TFE4141-Project.git\Project\RSA_example_testbench\ComFile.txt";  
   file ComFile: TEXT open read_mode is ComFileName;
   
   type CryptoStateType is (e_IDLE, e_READ_DATA, e_EXECUTE, e_INIT, e_ENCRYPT,
