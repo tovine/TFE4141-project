@@ -60,7 +60,7 @@ end ControlFSM;
 architecture Behavioral of ControlFSM is
     type state is (IDLE, LOAD_CONFIG, LOAD_MESSAGE, RUN_BLAKLEY, RUN_MONPRO, OUTPUT_DATA);
     signal current_state, next_state : state;
-    signal substate_counter: integer range 0 to 128;
+    signal substate_counter: integer range 0 to 255;
 begin
 
 
