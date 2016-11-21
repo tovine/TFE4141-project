@@ -23,7 +23,7 @@ end register_enable_reset_n;
 
 architecture rtl of register_enable_reset_n is
 begin
-  process(clk, reset_n)
+  process(clk, reset_n, en)
   begin
     if(reset_n = '0') then
       q <= (others => '0');

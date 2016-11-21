@@ -12,11 +12,11 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="120325172fs"></ZoomStartTime>
-      <ZoomEndTime time="191485221fs"></ZoomEndTime>
-      <Cursor1Time time="2603061000fs"></Cursor1Time>
+      <ZoomStartTime time="32000fs"></ZoomStartTime>
+      <ZoomEndTime time="224032001fs"></ZoomEndTime>
+      <Cursor1Time time="60000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="34" />
+   <WVObjectSize size="35" />
    <wvobject fp_name="/RSACoreTestBench/Clk" type="logic">
       <obj_property name="ElementShortName">Clk</obj_property>
       <obj_property name="ObjectShortName">Clk</obj_property>
@@ -76,6 +76,10 @@
    <wvobject fp_name="/RSACoreTestBench/MAXSHIFT" type="other">
       <obj_property name="ElementShortName">MAXSHIFT</obj_property>
       <obj_property name="ObjectShortName">MAXSHIFT</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/control/substate_counter" type="other">
+      <obj_property name="ElementShortName">substate_counter</obj_property>
+      <obj_property name="ObjectShortName">substate_counter</obj_property>
    </wvobject>
    <wvobject fp_name="/RSACoreTestBench/R/load_msg" type="array">
       <obj_property name="ElementShortName">load_msg[3:0]</obj_property>
