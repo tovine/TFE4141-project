@@ -12,11 +12,11 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="32000fs"></ZoomStartTime>
-      <ZoomEndTime time="224032001fs"></ZoomEndTime>
-      <Cursor1Time time="60000000fs"></Cursor1Time>
+      <ZoomStartTime time="5220537091fs"></ZoomStartTime>
+      <ZoomEndTime time="5917234404fs"></ZoomEndTime>
+      <Cursor1Time time="10000000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="35" />
+   <WVObjectSize size="36" />
    <wvobject fp_name="/RSACoreTestBench/Clk" type="logic">
       <obj_property name="ElementShortName">Clk</obj_property>
       <obj_property name="ObjectShortName">Clk</obj_property>
@@ -49,10 +49,6 @@
       <obj_property name="ElementShortName">CryptoState</obj_property>
       <obj_property name="ObjectShortName">CryptoState</obj_property>
    </wvobject>
-   <wvobject fp_name="/RSACoreTestBench/ShiftCtr" type="other">
-      <obj_property name="ElementShortName">ShiftCtr</obj_property>
-      <obj_property name="ObjectShortName">ShiftCtr</obj_property>
-   </wvobject>
    <wvobject fp_name="/RSACoreTestBench/NEKey" type="array">
       <obj_property name="ElementShortName">NEKey[255:0]</obj_property>
       <obj_property name="ObjectShortName">NEKey[255:0]</obj_property>
@@ -69,17 +65,21 @@
       <obj_property name="ElementShortName">Result[127:0]</obj_property>
       <obj_property name="ObjectShortName">Result[127:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/RSACoreTestBench/Command" type="logic">
-      <obj_property name="ElementShortName">Command</obj_property>
-      <obj_property name="ObjectShortName">Command</obj_property>
-   </wvobject>
-   <wvobject fp_name="/RSACoreTestBench/MAXSHIFT" type="other">
-      <obj_property name="ElementShortName">MAXSHIFT</obj_property>
-      <obj_property name="ObjectShortName">MAXSHIFT</obj_property>
+   <wvobject fp_name="/RSACoreTestBench/R/control/current_state_reg" type="other">
+      <obj_property name="ElementShortName">current_state_reg</obj_property>
+      <obj_property name="ObjectShortName">current_state_reg</obj_property>
    </wvobject>
    <wvobject fp_name="/RSACoreTestBench/R/control/substate_counter" type="other">
       <obj_property name="ElementShortName">substate_counter</obj_property>
       <obj_property name="ObjectShortName">substate_counter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/control/increment_substate" type="logic">
+      <obj_property name="ElementShortName">increment_substate</obj_property>
+      <obj_property name="ObjectShortName">increment_substate</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/control/clear_substate" type="logic">
+      <obj_property name="ElementShortName">clear_substate</obj_property>
+      <obj_property name="ObjectShortName">clear_substate</obj_property>
    </wvobject>
    <wvobject fp_name="/RSACoreTestBench/R/load_msg" type="array">
       <obj_property name="ElementShortName">load_msg[3:0]</obj_property>
@@ -120,6 +120,10 @@
    <wvobject fp_name="/RSACoreTestBench/R/blakley_done" type="logic">
       <obj_property name="ElementShortName">blakley_done</obj_property>
       <obj_property name="ObjectShortName">blakley_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/control/monpro_second_round" type="logic">
+      <obj_property name="ElementShortName">monpro_second_round</obj_property>
+      <obj_property name="ObjectShortName">monpro_second_round</obj_property>
    </wvobject>
    <wvobject fp_name="/RSACoreTestBench/R/monpro_done" type="logic">
       <obj_property name="ElementShortName">monpro_done</obj_property>

@@ -68,13 +68,11 @@ architecture Behavioral of ControlFSM is
     signal clear_substate: std_logic;
 begin
 
-StateProcess: process (current_state_reg, init_rsa, start_rsa, monpro_done, blakley_done, substate_counter, reset_n)
+StateProcess: process (current_state_reg, init_rsa, start_rsa, monpro_done, monpro_second_round, blakley_done, substate_counter, current_e_bit_is_high, reset_n)
     variable current_state, next_state : state;
 begin
     current_state := current_state_reg;
     next_state := current_state_reg;
-    --if (reset_n = '0') then
-    --end if;
     -- Set default values for internal signals
     monpro_second_round <= '0';
     increment_substate <= '0';
@@ -93,7 +91,7 @@ begin
     select_monpro_input_1 <= '0';
     select_monpro_input_2 <= '0';
     start_monpro <= '0';
-    current_e_bit <= 0;
+  --  current_e_bit <= 0;
     select_output <= "00";
 
     case (current_state_reg) is
@@ -110,11 +108,13 @@ begin
             next_state := LOAD_CONFIG;
             current_state := LOAD_CONFIG;
             increment_substate <= '1';
-            load_key_e <= "0001"; -- We need to do it here to save time
+            load_key_e <= "0001"; -- We need to do it here to respond immediately
             core_finished <= '0';
         elsif (start_rsa = '1') then
             next_state := LOAD_MESSAGE;
-            load_msg <= "0001";
+            current_state := LOAD_MESSAGE;
+            increment_substate <= '1';
+            load_msg <= "0001"; -- We need to do it here to respond immediately
             core_finished <= '0';
         else
             next_state := IDLE;
@@ -166,8 +166,7 @@ begin
             load_msg <= "0100";
         when 3 =>
             load_msg <= "1000";
-        when 4 => 
-            load_msg <= "0000";
+        when 4 =>
             start_blakley <= '1';
         when others =>
             start_blakley <= '0';
@@ -176,18 +175,22 @@ begin
                 -- Once the first blakley run completes, load the result into the msg registers
                 load_m_inverse <= '1';
                 next_state := RUN_MONPRO;
+                clear_substate <= '1';
+                increment_substate <= '0';
             end if;
         end case;
     -- /LOAD_MESSAGE
     when RUN_MONPRO =>
         next_state := RUN_MONPRO;
-        current_e_bit <= substate_counter; -- TODO: substate_counter + 1?
+      --  current_e_bit <= substate_counter; -- TODO: substate_counter + 1?
         if (substate_counter = 128) then -- TODO: 129 instead?
+            -- Special last iteration to transform the result back to regular form
             select_monpro_input_2 <= '1';
             start_monpro <= '1';
             increment_substate <= '1';
-        elsif (monpro_done = '1' AND substate_counter = 129) then -- TODO: 130 instead?
+        elsif (monpro_done = '1' AND substate_counter > 128) then -- TODO: 130 instead?
             next_state := OUTPUT_DATA;
+            clear_substate <= '1';
         elsif (monpro_done = '1' OR substate_counter = 0) then
             start_monpro <= '1';
             if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
@@ -247,8 +250,14 @@ end process;
 --  - For 4 clock periods, output a new 32-bit chunk of data
 --  - return to IDLE
 
+-- Workaround to see if this helps with e_bit_high being undefined
+EBitProc: process(substate_counter)
+begin
+    current_e_bit <= substate_counter;
+end process;
+
 -- Process to keep track of incrementing the counter
-SynchronousProcess: process(clk, reset_n)
+SynchronousProcess: process(clk, reset_n, clear_substate)
 begin
     if (reset_n = '0') then
         substate_counter <= 0;

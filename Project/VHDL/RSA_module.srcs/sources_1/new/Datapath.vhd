@@ -155,7 +155,7 @@ end process;
 
 
 -- Route the correct input to the message registers
-select_message_input : process (load_blakley_to_msg)
+select_message_input : process (load_blakley_to_msg, data_in, blakley_result)
 begin
     if (load_blakley_to_msg = '1') then
         msg_3 <= blakley_result(127 downto 96);
