@@ -68,7 +68,7 @@ architecture Behavioral of ControlFSM is
     signal clear_substate: std_logic;
 begin
 
-StateProcess: process (current_state_reg, init_rsa, start_rsa, monpro_done, blakley_done, reset_n)
+StateProcess: process (current_state_reg, init_rsa, start_rsa, monpro_done, blakley_done, substate_counter, reset_n)
     variable current_state, next_state : state;
 begin
     current_state := current_state_reg;
@@ -116,6 +116,8 @@ begin
             next_state := LOAD_MESSAGE;
             load_msg <= "0001";
             core_finished <= '0';
+        else
+            next_state := IDLE;
         end if;
     -- /IDLE
     when LOAD_CONFIG =>
@@ -148,9 +150,12 @@ begin
         if (blakley_done = '1') then -- The last register has been loaded
             next_state := IDLE;
             clear_substate <= '1';
+        else
+            next_state := LOAD_CONFIG;
         end if;
     -- /LOAD_CONFIG
     when LOAD_MESSAGE =>
+        next_state := LOAD_MESSAGE;
         increment_substate <= '1';
         case (substate_counter) is
         when 0 =>
@@ -175,6 +180,7 @@ begin
         end case;
     -- /LOAD_MESSAGE
     when RUN_MONPRO =>
+        next_state := RUN_MONPRO;
         current_e_bit <= substate_counter; -- TODO: substate_counter + 1?
         if (substate_counter = 128) then -- TODO: 129 instead?
             select_monpro_input_2 <= '1';
@@ -195,7 +201,7 @@ begin
             end if;
         end if;
     when OUTPUT_DATA =>
-        -- TODO
+        next_state := OUTPUT_DATA;
         core_finished <= '1';
         increment_substate <= '1';
         case (substate_counter) is
