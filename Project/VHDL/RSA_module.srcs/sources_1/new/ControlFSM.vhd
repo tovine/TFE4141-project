@@ -170,16 +170,19 @@ begin
             load_msg <= "1000";
         when 4 =>
             start_blakley <= '1';
-        when others =>
+        when 5 =>
             start_blakley <= '0';
             increment_substate <= '0';
             if (blakley_done = '1') then
                 -- Once the first blakley run completes, load the result into the msg registers
                 load_m_inverse <= '1';
-                next_state := RUN_MONPRO;
-                clear_substate <= '1';
-                increment_substate <= '0';
+                increment_substate <= '1';
             end if;
+        when others =>
+            next_state := RUN_MONPRO;
+            clear_substate <= '1';
+            increment_substate <= '0';
+            start_monpro <= '1';
         end case;
     -- /LOAD_MESSAGE
     when RUN_MONPRO =>
@@ -193,11 +196,11 @@ begin
         elsif (monpro_done = '1' AND substate_counter > 128) then -- TODO: 130 instead?
             next_state := OUTPUT_DATA;
             clear_substate <= '1';
-        elsif (monpro_done = '1' OR substate_counter = 0) then
+        elsif (monpro_done = '1') then
             start_monpro <= '1';
             if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
                 select_monpro_input_1 <= '1';
-            else
+            elsif (monpro_done = '1') then
                 if (current_e_bit_is_high = '1' and monpro_second_round = '0') then
                     monpro_second_round <= '1';
                 else
