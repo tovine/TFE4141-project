@@ -41,6 +41,7 @@ architecture Behavioral of monpro_tb is
     signal Clk_tb : std_logic:='0';
     signal Reset_n_tb : std_logic:='1';
     signal done : std_logic;
+    signal start : std_logic;
     signal a_tb : std_logic_vector(OPERAND_WIDTH-1 downto 0);
     signal b_tb : std_logic_vector(OPERAND_WIDTH-1 downto 0);
     signal n_tb : std_logic_vector(OPERAND_WIDTH-1 downto 0);
@@ -52,6 +53,7 @@ DUT : entity work.monpro
         a => a_tb,
         b => b_tb,
         n => n_tb,
+        start => start,
         result => p_tb,
         clk => Clk_tb,
         reset_n => Reset_n_tb,
@@ -80,6 +82,10 @@ DUT : entity work.monpro
 --        a_tb <= "0x0aaabbbb"; -- TODO: find good test stimuli
 --        b_tb <= "0x
           Reset_n_tb <= '1';
+        wait for 20 ns;
+            start <= '1';
+        wait for 20 ns;
+            start <= '0';
         wait for 20us;
         --wait for done = '1';
         -- Repeat

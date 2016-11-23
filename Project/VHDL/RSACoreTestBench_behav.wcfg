@@ -12,11 +12,11 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="1227723297fs"></ZoomEndTime>
-      <Cursor1Time time="0fs"></Cursor1Time>
+      <ZoomStartTime time="7318338581fs"></ZoomStartTime>
+      <ZoomEndTime time="8401299213fs"></ZoomEndTime>
+      <Cursor1Time time="8220000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="37" />
+   <WVObjectSize size="48" />
    <wvobject fp_name="/RSACoreTestBench/Clk" type="logic">
       <obj_property name="ElementShortName">Clk</obj_property>
       <obj_property name="ObjectShortName">Clk</obj_property>
@@ -129,6 +129,10 @@
       <obj_property name="ElementShortName">monpro_second_round</obj_property>
       <obj_property name="ObjectShortName">monpro_second_round</obj_property>
    </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/counter" type="other">
+      <obj_property name="ElementShortName">counter</obj_property>
+      <obj_property name="ObjectShortName">counter</obj_property>
+   </wvobject>
    <wvobject fp_name="/RSACoreTestBench/R/monpro_done" type="logic">
       <obj_property name="ElementShortName">monpro_done</obj_property>
       <obj_property name="ObjectShortName">monpro_done</obj_property>
@@ -164,5 +168,45 @@
    <wvobject fp_name="/RSACoreTestBench/R/datapath/key_e" type="array">
       <obj_property name="ElementShortName">key_e[127:0]</obj_property>
       <obj_property name="ObjectShortName">key_e[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/a" type="array">
+      <obj_property name="ElementShortName">a[127:0]</obj_property>
+      <obj_property name="ObjectShortName">a[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/b" type="array">
+      <obj_property name="ElementShortName">b[127:0]</obj_property>
+      <obj_property name="ObjectShortName">b[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/result" type="array">
+      <obj_property name="ElementShortName">result[127:0]</obj_property>
+      <obj_property name="ObjectShortName">result[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/running" type="logic">
+      <obj_property name="ElementShortName">running</obj_property>
+      <obj_property name="ObjectShortName">running</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/x_inverse" type="array">
+      <obj_property name="ElementShortName">x_inverse[127:0]</obj_property>
+      <obj_property name="ObjectShortName">x_inverse[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/reset_n" type="logic">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/counter" type="other">
+      <obj_property name="ElementShortName">counter</obj_property>
+      <obj_property name="ObjectShortName">counter</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/running" type="logic">
+      <obj_property name="ElementShortName">running</obj_property>
+      <obj_property name="ObjectShortName">running</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
    </wvobject>
 </wave_config>

@@ -111,13 +111,13 @@ blakley : entity work.blakley
     );
     
 -- Return the selected but from key_e
-get_e_bit : process (current_e_bit)
+get_e_bit : process (current_e_bit, key_e)
 begin
     key_e_bit_is_high <= key_e(current_e_bit);
 end process;
 
 -- Route the correct input to the x_ register
-select_x_inverse_input : process (load_blakley_to_x_inverse)
+select_x_inverse_input : process (load_blakley_to_x_inverse, blakley_result, monpro_result)
 begin
     if (load_blakley_to_x_inverse = '1') then
         x_inverse_next <= blakley_result;
@@ -127,7 +127,7 @@ begin
 end process;
 
 -- Select the correct input for blakley
-blakley_input_proc : process (select_blakley_input)
+blakley_input_proc : process (select_blakley_input, message)
 begin
     if (select_blakley_input = '1') then
         blakley_input(0) <= '1';
@@ -138,7 +138,7 @@ begin
 end process;
 
 -- Select the correct input for monpro
-monpro_input_proc : process (select_monpro_input_1, select_monpro_input_2)
+monpro_input_proc : process (select_monpro_input_1, select_monpro_input_2, message, x_inverse)
 begin
     if (select_monpro_input_1 = '1') then
         operand_a <= message;
@@ -177,7 +177,7 @@ load_msg_2 <= load_msg(2) OR load_blakley_to_msg;
 load_msg_3 <= load_msg(3) OR load_blakley_to_msg;   
 
 -- Route the correct 32 bits to the output
-select_output_register : process (clk, select_output)
+select_output_register : process (clk, select_output, monpro_result)
 begin
 if (clk'event AND clk = '1') then
     case(select_output) is
