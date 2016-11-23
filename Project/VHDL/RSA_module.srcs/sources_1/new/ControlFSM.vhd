@@ -61,7 +61,7 @@ end ControlFSM;
 
 architecture Behavioral of ControlFSM is
     type state is (IDLE, LOAD_CONFIG, LOAD_MESSAGE, RUN_BLAKLEY, RUN_MONPRO, OUTPUT_DATA);
-    signal current_state_reg : state;
+    signal current_state_reg, next_state_reg : state;
     signal substate_counter: integer range 0 to 255;
     signal monpro_second_round: std_logic;
     signal increment_substate: std_logic;
@@ -72,7 +72,7 @@ StateProcess: process (current_state_reg, init_rsa, start_rsa, monpro_done, monp
     variable current_state, next_state : state;
 begin
     current_state := current_state_reg;
-    next_state := current_state_reg;
+    next_state := next_state_reg;
     -- Set default values for internal signals
     monpro_second_round <= '0';
     increment_substate <= '0';
@@ -108,12 +108,14 @@ begin
             next_state := LOAD_CONFIG;
             current_state := LOAD_CONFIG;
             increment_substate <= '1';
+            clear_substate <= '0';
             load_key_e <= "0001"; -- We need to do it here to respond immediately
             core_finished <= '0';
         elsif (start_rsa = '1') then
             next_state := LOAD_MESSAGE;
             current_state := LOAD_MESSAGE;
             increment_substate <= '1';
+            clear_substate <= '0';
             load_msg <= "0001"; -- We need to do it here to respond immediately
             core_finished <= '0';
         else
@@ -223,10 +225,10 @@ begin
         -- Should never get here, something's wrong
         next_state := IDLE;
     end case; -- current_state
-    if (current_state /= next_state) then -- Make sure to reset the substate counter when changing states
-        clear_substate <= '1';
-    end if;
-    current_state_reg <= next_state;
+--    if (current_state /= next_state AND current_state /= IDLE) then -- Make sure to reset the substate counter when changing states
+--        clear_substate <= '1';
+--    end if;
+    next_state_reg <= next_state;
 end process;     
 -- *********************************************************************
 -- Things to do in the different states:
@@ -262,6 +264,7 @@ begin
     if (reset_n = '0') then
         substate_counter <= 0;
     elsif (clk'event AND clk = '1') then
+        current_state_reg <= next_state_reg;
         if (increment_substate = '1') then
             substate_counter <= substate_counter + 1;
         end if;
