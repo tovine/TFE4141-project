@@ -10,11 +10,11 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="2413333334fs"></ZoomStartTime>
-      <ZoomEndTime time="3533333335fs"></ZoomEndTime>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="1120000002fs"></ZoomEndTime>
       <Cursor1Time time="2600000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="12" />
+   <WVObjectSize size="13" />
    <wvobject fp_name="/monpro_tb/DUT/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -62,5 +62,9 @@
    <wvobject fp_name="/monpro_tb/DUT/result_next" type="array">
       <obj_property name="ElementShortName">result_next[127:0]</obj_property>
       <obj_property name="ObjectShortName">result_next[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/monpro_tb/DUT/result_now" type="array">
+      <obj_property name="ElementShortName">result_now[127:0]</obj_property>
+      <obj_property name="ObjectShortName">result_now[127:0]</obj_property>
    </wvobject>
 </wave_config>

@@ -57,10 +57,10 @@ begin
     
     process (reset_n, clk)
     begin
+        result_now <= (others => '0');
         if (reset_n = '0') then
             counter <= 0;
             done <= '0';
-            result_now <= (others => '0');
         elsif (clk'event AND clk = '1') then
             result_now <= result_next;
             if (counter >= OPERAND_WIDTH) then
@@ -72,12 +72,12 @@ begin
         end if;
     end process;
 
-    process(reset_n, start, result_now, running, n, b, counter)
+    process(reset_n, start, result_now, running, a, b, n, counter)
         variable should_add : STD_LOGIC;
-        variable result_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+        variable result_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH downto 0);
     begin
-        result_tmp := result_now;
-        should_add := '0';
+        result_tmp(OPERAND_WIDTH-1 downto 0) := result_now;
+--        should_add := '0';
   --      if (reset_n = '0') then
             running <= '0';
 --            result_tmp := (others => '0');
@@ -85,30 +85,30 @@ begin
         
         if (start = '1' AND running = '0') then
             running <= '1';
+            result_tmp := (others => '0');
 --            done <= '0';
         end if;
-        if (running = '1') then
-
-            if (counter >= OPERAND_WIDTH) then -- Done computing, reduce result and return
-                if (result_tmp >= n) then
-                    result_tmp := result_tmp - n;
-                end if;
-                running <= '0';
-            else
-                should_add := a(counter);
-                if (should_add = '1') then
-                    result_tmp := result_tmp + b;
-                end if;
-                if (result_tmp(0) = '1') then
-                    result_tmp := result_tmp + n;
-                end if;
-                result_tmp := ("0" & result_tmp(OPERAND_WIDTH-1 downto 1)); -- right shift by one
+--        if (running = '1') then
+        if (counter >= OPERAND_WIDTH) then -- Done computing, reduce result and return
+            if (result_tmp >= n) then
+                result_tmp := result_tmp - n;
+            end if;
+            running <= '0';
+        else
+--                should_add := a(counter);
+            if (a(counter) = '1') then
+                result_tmp := result_tmp + b;
+            end if;
+            if (result_tmp(0) = '1') then
+                result_tmp := result_tmp + n;
+            end if;
+            result_tmp := ("0" & result_tmp(OPERAND_WIDTH downto 1)); -- right shift by one
 --                counter <= counter + 1;
 --                done <= '0';
-                running <= '1';
-            end if;
+            running <= '1';
         end if;
-        result_next <= result_tmp;
+--      end if;
+        result_next <= result_tmp(OPERAND_WIDTH-1 downto 0);
     end process;
 
 end Behavioral;
