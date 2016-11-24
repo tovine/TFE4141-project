@@ -82,14 +82,20 @@ DUT : entity work.monpro
 --        a_tb <= "0x0aaabbbb"; -- TODO: find good test stimuli
 --        b_tb <= "0x
           Reset_n_tb <= '1';
-        wait for 20 ns;
-            start <= '1';
-        wait for 20 ns;
-            start <= '0';
         wait for 20us;
         --wait for done = '1';
         -- Repeat
         --ASSERT 0;
+    end process;
+
+    process(done, Reset_n_tb)
+    begin
+    if ((Reset_n_tb'event and Reset_n_tb = '1') or (done'event and done ='1')) then
+        start <= '1';
+    else
+        start <= '0';
+    end if;
+
     end process;
 
 end Behavioral;
