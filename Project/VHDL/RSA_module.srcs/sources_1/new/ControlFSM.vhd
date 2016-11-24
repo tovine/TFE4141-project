@@ -147,6 +147,7 @@ begin
         when others =>
             select_blakley_input <= '1';
             blakley_to_x_inverse <= '1';
+            load_x_inverse <= '1';
             increment_substate <= '0';
         end case;
         if (blakley_done = '1') then -- The last register has been loaded
@@ -194,9 +195,11 @@ begin
             start_monpro <= '1';
             increment_substate <= '1';
         elsif (monpro_done = '1' AND substate_counter > 128) then -- TODO: 130 instead?
+            load_x_inverse <= '1';
             next_state := OUTPUT_DATA;
             clear_substate <= '1';
         elsif (monpro_done = '1') then
+            load_x_inverse <= '1';
             start_monpro <= '1';
             if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
                 select_monpro_input_1 <= '1';
