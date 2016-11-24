@@ -113,7 +113,11 @@ blakley : entity work.blakley
 -- Return the selected but from key_e
 get_e_bit : process (current_e_bit, key_e)
 begin
-    key_e_bit_is_high <= key_e(current_e_bit);
+	if (current_e_bit < 128) then
+		key_e_bit_is_high <= key_e(current_e_bit);
+	else 
+		key_e_bit_is_high <= '0';
+	end if;
 end process;
 
 -- Route the correct input to the x_ register

@@ -76,7 +76,11 @@ begin
     current_state := current_state_reg;
     next_state := next_state_reg;
     -- Set default values for internal signals
-    monpro_second_round <= '0';
+	if (reset_n = '0') then
+		monpro_second_round <= '0';
+	else
+		monpro_second_round <= monpro_second_round;
+	end if;
     increment_substate <= '0';
     clear_substate <= '0';
     core_finished <= '0';
@@ -202,6 +206,7 @@ begin
             select_monpro_input_1 <= '0';
             select_monpro_input_2 <= '0';
             load_x_inverse <= '1';
+			monpro_second_round <= '0';
             if (substate_counter > 128) then -- TODO: 130 instead?
                 next_state := OUTPUT_DATA;
                 clear_substate <= '1';
@@ -210,10 +215,10 @@ begin
 --                start_monpro_delayed <= '1';
                 next_state := RUN_MONPRO;
                 if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
-                    select_monpro_input_1 <= '1';
-					increment_substate <= '0';
+					increment_substate <= '1';
                 else
                     if (current_e_bit_is_high = '1' and monpro_second_round = '0') then
+						select_monpro_input_1 <= '1';
                         monpro_second_round <= '1';
                         increment_substate <= '0';
                     end if;
