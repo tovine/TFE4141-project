@@ -49,52 +49,66 @@ end monpro;
 architecture Behavioral of monpro is
     signal counter: INTEGER range 0 to 255;-- (7 downto 0);
     signal running: std_logic;
-    signal last_result: STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+    signal result_next: STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+    signal result_now: STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
 begin
 
+    result <= result_now;
+    
+    process (reset_n, clk)
+    begin
+        if (reset_n = '0') then
+            counter <= 0;
+            done <= '0';
+            result_now <= (others => '0');
+        elsif (clk'event AND clk = '1') then
+            result_now <= result_next;
+            if (counter >= OPERAND_WIDTH) then
+                done <= '1';
+            elsif (running = '1') then
+                counter <= counter + 1;
+                done <= '0';
+            end if;
+        end if;
+    end process;
 
-    process(clk, reset_n, start)
+    process(reset_n, start, result_now, running, n, b, counter)
         variable should_add : STD_LOGIC;
         variable result_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
     begin
-        result_tmp := last_result;
+        result_tmp := result_now;
         should_add := '0';
-        if (reset_n = '0') then
+  --      if (reset_n = '0') then
             running <= '0';
-            result_tmp := (others => '0');
-            counter <= 0;
-            done <= '0';
-        end if;
+--            result_tmp := (others => '0');
+  --      end if;
         
-        if (clk'event AND clk = '1') then
-            if (start = '1' AND running = '0') then
-                running <= '1';
-                done <= '0';
-            end if;
-            if (running = '1') then
-                done <= '1';
-                counter <= 0;
-                running <= '0'; 
-                if (counter = OPERAND_WIDTH) then -- Done computing, reduce result and return
-                    if (result_tmp >= n) then
-                        result_tmp := result_tmp - n;
-                    end if;
-                else
-                    should_add := a(counter);
-                    if (should_add = '1') then
-                        result_tmp := result_tmp + b;
-                    end if;
-                    if (result_tmp(0) = '1') then
-                        result_tmp := result_tmp + n;
-                    end if;
-                    result_tmp := ("0" & result_tmp(OPERAND_WIDTH-1 downto 1)); -- right shift by one
-                    counter <= counter + 1;
-                    done <= '0';
-                    running <= '1';
+        if (start = '1' AND running = '0') then
+            running <= '1';
+--            done <= '0';
+        end if;
+        if (running = '1') then
+
+            if (counter >= OPERAND_WIDTH) then -- Done computing, reduce result and return
+                if (result_tmp >= n) then
+                    result_tmp := result_tmp - n;
                 end if;
+                running <= '0';
+            else
+                should_add := a(counter);
+                if (should_add = '1') then
+                    result_tmp := result_tmp + b;
+                end if;
+                if (result_tmp(0) = '1') then
+                    result_tmp := result_tmp + n;
+                end if;
+                result_tmp := ("0" & result_tmp(OPERAND_WIDTH-1 downto 1)); -- right shift by one
+--                counter <= counter + 1;
+--                done <= '0';
+                running <= '1';
             end if;
         end if;
-        last_result <= result_tmp;
+        result_next <= result_tmp;
     end process;
 
 end Behavioral;

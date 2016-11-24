@@ -10,11 +10,23 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="23567416297fs"></ZoomStartTime>
-      <ZoomEndTime time="25286516741fs"></ZoomEndTime>
-      <Cursor1Time time="25000000000fs"></Cursor1Time>
+      <ZoomStartTime time="2413333334fs"></ZoomStartTime>
+      <ZoomEndTime time="3533333335fs"></ZoomEndTime>
+      <Cursor1Time time="2600000000fs"></Cursor1Time>
    </zoom_setting>
    <WVObjectSize size="12" />
+   <wvobject fp_name="/monpro_tb/DUT/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/monpro_tb/DUT/reset_n" type="logic">
+      <obj_property name="ElementShortName">reset_n</obj_property>
+      <obj_property name="ObjectShortName">reset_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/monpro_tb/DUT/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
    <wvobject fp_name="/monpro_tb/DUT/a" type="array">
       <obj_property name="ElementShortName">a[127:0]</obj_property>
       <obj_property name="ObjectShortName">a[127:0]</obj_property>
@@ -30,18 +42,6 @@
    <wvobject fp_name="/monpro_tb/DUT/result" type="array">
       <obj_property name="ElementShortName">result[127:0]</obj_property>
       <obj_property name="ObjectShortName">result[127:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/monpro_tb/DUT/clk" type="logic">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/monpro_tb/DUT/reset_n" type="logic">
-      <obj_property name="ElementShortName">reset_n</obj_property>
-      <obj_property name="ObjectShortName">reset_n</obj_property>
-   </wvobject>
-   <wvobject fp_name="/monpro_tb/DUT/start" type="logic">
-      <obj_property name="ElementShortName">start</obj_property>
-      <obj_property name="ObjectShortName">start</obj_property>
    </wvobject>
    <wvobject fp_name="/monpro_tb/DUT/done" type="logic">
       <obj_property name="ElementShortName">done</obj_property>
@@ -59,8 +59,8 @@
       <obj_property name="ElementShortName">OPERAND_WIDTH</obj_property>
       <obj_property name="ObjectShortName">OPERAND_WIDTH</obj_property>
    </wvobject>
-   <wvobject fp_name="/monpro_tb/DUT/last_result" type="array">
-      <obj_property name="ElementShortName">last_result[127:0]</obj_property>
-      <obj_property name="ObjectShortName">last_result[127:0]</obj_property>
+   <wvobject fp_name="/monpro_tb/DUT/result_next" type="array">
+      <obj_property name="ElementShortName">result_next[127:0]</obj_property>
+      <obj_property name="ObjectShortName">result_next[127:0]</obj_property>
    </wvobject>
 </wave_config>
