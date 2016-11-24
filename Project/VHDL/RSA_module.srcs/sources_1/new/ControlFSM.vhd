@@ -66,6 +66,7 @@ architecture Behavioral of ControlFSM is
     signal monpro_second_round: std_logic;
     signal increment_substate: std_logic;
     signal clear_substate: std_logic;
+    signal start_monpro_delayed : std_logic; -- for delaying the following start signals and see if that fixes stuff (DEBUG)
 begin
 
 StateProcess: process (current_state_reg, init_rsa, start_rsa, monpro_done, monpro_second_round, blakley_done, substate_counter, current_e_bit_is_high, reset_n)
@@ -90,7 +91,7 @@ begin
     load_x_inverse <= '0';
     select_monpro_input_1 <= '0';
     select_monpro_input_2 <= '0';
-    start_monpro <= '0';
+    start_monpro_delayed <= '0';
   --  current_e_bit <= 0;
     select_output <= "00";
 
@@ -100,7 +101,7 @@ begin
         load_key_n <= "0000";
         load_key_e <= "0000";
         select_output <= "00";
-        start_monpro <= '0';
+        start_monpro_delayed <= '0';
         start_blakley <= '0';
         core_finished <= '1';
         clear_substate <= '1';
@@ -183,7 +184,7 @@ begin
             next_state := RUN_MONPRO;
             clear_substate <= '1';
             increment_substate <= '0';
-            start_monpro <= '1';
+            start_monpro_delayed <= '1';
         end case;
     -- /LOAD_MESSAGE
     when RUN_MONPRO =>
@@ -192,22 +193,23 @@ begin
         if (substate_counter = 128) then -- TODO: 129 instead?
             -- Special last iteration to transform the result back to regular form
             select_monpro_input_2 <= '1';
-            start_monpro <= '1';
+            start_monpro_delayed <= '1';
             increment_substate <= '1';
-        elsif (monpro_done = '1' AND substate_counter > 128) then -- TODO: 130 instead?
+        elsif (monpro_done = '1') then 
             load_x_inverse <= '1';
-            next_state := OUTPUT_DATA;
-            clear_substate <= '1';
-        elsif (monpro_done = '1') then
-            load_x_inverse <= '1';
-            start_monpro <= '1';
-            if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
-                select_monpro_input_1 <= '1';
-            elsif (monpro_done = '1') then
-                if (current_e_bit_is_high = '1' and monpro_second_round = '0') then
-                    monpro_second_round <= '1';
+            if (substate_counter > 128) then -- TODO: 130 instead?
+                next_state := OUTPUT_DATA;
+                clear_substate <= '1';
+            else
+                start_monpro_delayed <= '1';
+                if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
+                    select_monpro_input_1 <= '1';
                 else
-                    increment_substate <= '1';
+                    if (current_e_bit_is_high = '1' and monpro_second_round = '0') then
+                        monpro_second_round <= '1';
+                    else
+                        increment_substate <= '1';
+                    end if;
                 end if;
             end if;
         end if;
@@ -269,6 +271,7 @@ SynchronousProcess: process(clk, reset_n, clear_substate)
 begin
     if (reset_n = '0') then
         substate_counter <= 0;
+--        current_state_reg <= IDLE;
     elsif (clk'event AND clk = '1') then
         current_state_reg <= next_state_reg;
         if (increment_substate = '1') then
@@ -278,6 +281,14 @@ begin
             substate_counter <= 0;
         end if;
     end if; -- clk edge
+end process;
+
+-- Simple process to delay the start_monpro signal by one clock period
+process(clk)
+begin
+    if (clk'event AND clk = '1') then
+        start_monpro <= start_monpro_delayed;
+    end if;
 end process;
 
 end Behavioral;
