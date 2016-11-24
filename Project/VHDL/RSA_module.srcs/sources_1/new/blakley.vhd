@@ -45,14 +45,14 @@ entity blakley is
 end blakley;
 
 architecture Behavioral of blakley is
-    signal counter: INTEGER range 0 to OPERAND_WIDTH+1;-- (7 downto 0);
+    signal counter: INTEGER range 0 to 255;-- (7 downto 0);
     signal running: std_logic;
  --   signal a: STD_LOGIC_VECTOR (OPERAND_WIDTH downto 0) := x"10000000000000000"; -- = 2^128 TODO: simplify
 begin
 
     process(clk, reset_n, start)
         --variable should_add : STD_LOGIC;
-        variable p_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH-1 downto 0);
+        variable p_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH downto 0);
     begin
 --        should_add := '0';
         if (reset_n = '0') then
@@ -71,7 +71,7 @@ begin
                 running <= '0';
             else
                 --p_tmp <= shift_left(p_tmp, std_logic_vector(1));
-                p_tmp := p_tmp(OPERAND_WIDTH-2 DOWNTO 0) & "0";
+                p_tmp := p_tmp(OPERAND_WIDTH-1 DOWNTO 0) & "0";
 --                should_add := a(OPERAND_WIDTH - 1 - counter); -- TODO: can be greatly simplified as a will always be 2^128
 --                if (should_add = '1') then
                 if (counter = 0) then
@@ -86,7 +86,7 @@ begin
                 counter <= counter + 1;
             end if;
         end if;
-        p <= p_tmp;
+        p <= p_tmp(OPERAND_WIDTH-1 downto 0);
     end process;
     
 end Behavioral;
