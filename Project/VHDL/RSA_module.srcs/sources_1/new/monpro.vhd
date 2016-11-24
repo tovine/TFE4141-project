@@ -57,8 +57,8 @@ begin
     
     process (reset_n, clk)
     begin
-        result_now <= (others => '0');
         if (reset_n = '0') then
+            result_now <= (others => '0');
             counter <= 0;
             done <= '0';
         elsif (clk'event AND clk = '1') then
@@ -88,26 +88,26 @@ begin
             result_tmp := (others => '0');
 --            done <= '0';
         end if;
---        if (running = '1') then
-        if (counter >= OPERAND_WIDTH) then -- Done computing, reduce result and return
-            if (result_tmp >= n) then
-                result_tmp := result_tmp - n;
+        if (running = '1') then
+            if (counter >= OPERAND_WIDTH) then -- Done computing, reduce result and return
+                if (result_tmp >= n) then
+                    result_tmp := result_tmp - n;
+                end if;
+                running <= '0';
+            else
+    --                should_add := a(counter);
+                if (a(counter) = '1') then
+                    result_tmp := result_tmp + b;
+                end if;
+                if (result_tmp(0) = '1') then
+                    result_tmp := result_tmp + n;
+                end if;
+                result_tmp := ("0" & result_tmp(OPERAND_WIDTH downto 1)); -- right shift by one
+    --                counter <= counter + 1;
+    --                done <= '0';
+                running <= '1';
             end if;
-            running <= '0';
-        else
---                should_add := a(counter);
-            if (a(counter) = '1') then
-                result_tmp := result_tmp + b;
-            end if;
-            if (result_tmp(0) = '1') then
-                result_tmp := result_tmp + n;
-            end if;
-            result_tmp := ("0" & result_tmp(OPERAND_WIDTH downto 1)); -- right shift by one
---                counter <= counter + 1;
---                done <= '0';
-            running <= '1';
         end if;
---      end if;
         result_next <= result_tmp(OPERAND_WIDTH-1 downto 0);
     end process;
 
