@@ -87,8 +87,8 @@ DUT : entity work.monpro
           Reset_n_tb <= '1';
         wait for 20 ns;
             start <= '1';
-        wait for 20 ns;
-            start <= '0';
+        --wait for 20 ns;
+          --  start <= '0';
         wait for 20us;
         --wait for done = '1';
         -- Repeat

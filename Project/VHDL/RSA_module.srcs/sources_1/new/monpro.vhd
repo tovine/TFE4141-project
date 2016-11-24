@@ -65,25 +65,32 @@ begin
             result_now <= result_next;
             if (counter >= OPERAND_WIDTH) then
                 done <= '1';
+				counter <= 0;
             elsif (running = '1') then
                 counter <= counter + 1;
                 done <= '0';
+			else
+				counter <= 0;
             end if;
         end if;
     end process;
 
-    process(reset_n, start, result_now, running, a, b, n, counter)
+    process(clk, reset_n, start, result_now, running, a, b, n, counter)
         variable should_add : STD_LOGIC;
         variable result_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH downto 0);
     begin
-        result_tmp(OPERAND_WIDTH-1 downto 0) := result_now;
+		if (counter = 0 AND running = '1') then
+			result_tmp := (others => '0');
+		else
+			result_tmp(OPERAND_WIDTH-1 downto 0) := result_now;
+		end if;
 --        should_add := '0';
   --      if (reset_n = '0') then
             running <= '0';
 --            result_tmp := (others => '0');
   --      end if;
         
-        if (start = '1' AND running = '0') then
+        if (clk'event AND clk = '1' AND start = '1' AND running = '0' AND counter = 0) then
             running <= '1';
             result_tmp := (others => '0');
 --            done <= '0';
