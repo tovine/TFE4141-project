@@ -69,7 +69,8 @@ architecture Behavioral of ControlFSM is
     signal start_monpro_delayed : std_logic; -- for delaying the following start signals and see if that fixes stuff (DEBUG)
 begin
 
-StateProcess: process (current_state_reg, init_rsa, start_rsa, monpro_done, monpro_second_round, blakley_done, substate_counter, current_e_bit_is_high, reset_n)
+StateProcess: process (current_state_reg, init_rsa, start_rsa, monpro_done, blakley_done,
+						substate_counter, current_e_bit_is_high, reset_n)
     variable current_state, next_state : state;
 begin
     current_state := current_state_reg;
@@ -205,15 +206,16 @@ begin
                 next_state := OUTPUT_DATA;
                 clear_substate <= '1';
             else
+				increment_substate <= '1';
 --                start_monpro_delayed <= '1';
                 next_state := RUN_MONPRO;
                 if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
                     select_monpro_input_1 <= '1';
+					increment_substate <= '0';
                 else
                     if (current_e_bit_is_high = '1' and monpro_second_round = '0') then
                         monpro_second_round <= '1';
-                    else
-                        increment_substate <= '1';
+                        increment_substate <= '0';
                     end if;
                 end if;
             end if;
