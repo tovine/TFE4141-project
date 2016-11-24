@@ -73,11 +73,14 @@ DUT : entity work.monpro
     stim_proc: process
     begin
         Reset_n_tb <='0'; -- TODO: verify that test stimuli makes sense
-                a_tb <= x"00000000000000000000000100000000";
---                b_tb <= x"0000000000000000000000000aaabbbb";
---                n_tb <= x"000000000000000000000000819dc6b2";
-                b_tb <= x"0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-                n_tb <= x"819DC6B2574E12C3C8BC49CDD79555FD";
+--                a_tb <= x"00000000000000000000000100000000";
+----                b_tb <= x"0000000000000000000000000aaabbbb";
+----                n_tb <= x"000000000000000000000000819dc6b2";
+--                b_tb <= x"0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+--                n_tb <= x"819DC6B2574E12C3C8BC49CDD79555FD";
+            a_tb <= x"7e62394da8b1ed3c3743b632286aaa03";
+            b_tb <= x"7e62394da8b1ed3c3743b632286aaa03";
+            n_tb <= x"819dc6b2574e12c3c8bc49cdd79555fd";
         wait for 20 ns;
 --        a_tb <= "0x0aaabbbb"; -- TODO: find good test stimuli
 --        b_tb <= "0x

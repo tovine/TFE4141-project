@@ -12,11 +12,11 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="7318338581fs"></ZoomStartTime>
-      <ZoomEndTime time="8401299213fs"></ZoomEndTime>
-      <Cursor1Time time="8220000000fs"></Cursor1Time>
+      <ZoomStartTime time="2532152000fs"></ZoomStartTime>
+      <ZoomEndTime time="2879152001fs"></ZoomEndTime>
+      <Cursor1Time time="2800000000fs"></Cursor1Time>
    </zoom_setting>
-   <WVObjectSize size="48" />
+   <WVObjectSize size="50" />
    <wvobject fp_name="/RSACoreTestBench/Clk" type="logic">
       <obj_property name="ElementShortName">Clk</obj_property>
       <obj_property name="ObjectShortName">Clk</obj_property>
@@ -208,5 +208,13 @@
    <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/start" type="logic">
       <obj_property name="ElementShortName">start</obj_property>
       <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/monpro/last_result" type="array">
+      <obj_property name="ElementShortName">last_result[127:0]</obj_property>
+      <obj_property name="ObjectShortName">last_result[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/RSACoreTestBench/R/datapath/blakley/p" type="array">
+      <obj_property name="ElementShortName">p[127:0]</obj_property>
+      <obj_property name="ObjectShortName">p[127:0]</obj_property>
    </wvobject>
 </wave_config>

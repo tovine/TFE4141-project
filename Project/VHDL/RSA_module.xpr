@@ -26,7 +26,7 @@
     <Option Name="IPStaticSourceDir" Val="$PPRDIR/RSA_module.ip_user_files/ipstatic"/>
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSABoardId" Val="zed"/>
-    <Option Name="WTXSimLaunchSim" Val="111"/>
+    <Option Name="WTXSimLaunchSim" Val="122"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
@@ -106,25 +106,28 @@
     </FileSet>
     <FileSet Name="sim_1" Type="SimulationSrcs" RelSrcDir="$PSRCDIR/sim_1">
       <Filter Type="Srcs"/>
+      <File Path="$PSRCDIR/sim_1/new/blakley_tb.vhd">
+        <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PPRDIR/../RSA_example_testbench/RSAParameters.vhd">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../RSA_example_testbench/CompDecl.vhd">
         <FileInfo>
+          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
       <File Path="$PPRDIR/../RSA_example_testbench/RSACoreTestBench.vhd">
-        <FileInfo>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sim_1/new/blakley_tb.vhd">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -148,7 +151,7 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="RSACoreTestBench"/>
+        <Option Name="TopModule" Val="monpro_tb"/>
         <Option Name="TopLib" Val="xil_defaultlib"/>
         <Option Name="TransportPathDelay" Val="0"/>
         <Option Name="TransportIntDelay" Val="0"/>
