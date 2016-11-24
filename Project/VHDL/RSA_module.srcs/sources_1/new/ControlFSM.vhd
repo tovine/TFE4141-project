@@ -60,7 +60,7 @@ entity ControlFSM is
 end ControlFSM;
 
 architecture Behavioral of ControlFSM is
-    type state is (IDLE, LOAD_CONFIG, LOAD_MESSAGE, RUN_BLAKLEY, RUN_MONPRO, OUTPUT_DATA);
+    type state is (IDLE, LOAD_CONFIG, LOAD_MESSAGE, WAIT_MONPRO, RUN_MONPRO, OUTPUT_DATA);
     signal current_state_reg, next_state_reg : state;
     signal substate_counter: integer range 0 to 255;
     signal monpro_second_round: std_logic;
@@ -89,9 +89,7 @@ begin
     blakley_to_x_inverse <= '0';
     load_m_inverse <= '0';
     load_x_inverse <= '0';
-    select_monpro_input_1 <= '0';
-    select_monpro_input_2 <= '0';
-    start_monpro_delayed <= '0';
+  --  start_monpro_delayed <= '0';
   --  current_e_bit <= 0;
     select_output <= "00";
 
@@ -102,6 +100,8 @@ begin
         load_key_e <= "0000";
         select_output <= "00";
         start_monpro_delayed <= '0';
+        select_monpro_input_1 <= '0';
+        select_monpro_input_2 <= '0';
         start_blakley <= '0';
         core_finished <= '1';
         clear_substate <= '1';
@@ -181,27 +181,32 @@ begin
                 increment_substate <= '1';
             end if;
         when others =>
-            next_state := RUN_MONPRO;
+            next_state := WAIT_MONPRO;
             clear_substate <= '1';
             increment_substate <= '0';
             start_monpro_delayed <= '1';
         end case;
     -- /LOAD_MESSAGE
-    when RUN_MONPRO =>
-        next_state := RUN_MONPRO;
+    when WAIT_MONPRO =>
+        next_state := WAIT_MONPRO;
+        start_monpro_delayed <= '0';
       --  current_e_bit <= substate_counter; -- TODO: substate_counter + 1?
-        if (substate_counter = 128) then -- TODO: 129 instead?
+        if (monpro_done = '1' AND substate_counter = 128) then -- TODO: 129 instead?
             -- Special last iteration to transform the result back to regular form
             select_monpro_input_2 <= '1';
-            start_monpro_delayed <= '1';
+       --     start_monpro_delayed <= '1';
+            next_state := RUN_MONPRO;
             increment_substate <= '1';
-        elsif (monpro_done = '1') then 
+        elsif (monpro_done = '1' and start_monpro_delayed = '0') then
+            select_monpro_input_1 <= '0';
+            select_monpro_input_2 <= '0';
             load_x_inverse <= '1';
             if (substate_counter > 128) then -- TODO: 130 instead?
                 next_state := OUTPUT_DATA;
                 clear_substate <= '1';
             else
-                start_monpro_delayed <= '1';
+--                start_monpro_delayed <= '1';
+                next_state := RUN_MONPRO;
                 if (monpro_second_round = '1') then -- Run monpro again with m_ as the first argument
                     select_monpro_input_1 <= '1';
                 else
@@ -213,6 +218,9 @@ begin
                 end if;
             end if;
         end if;
+    when RUN_MONPRO =>
+        start_monpro_delayed <= '1';
+        next_state := WAIT_MONPRO;
     when OUTPUT_DATA =>
         next_state := OUTPUT_DATA;
         core_finished <= '1';
@@ -284,7 +292,7 @@ begin
 end process;
 
 -- Simple process to delay the start_monpro signal by one clock period
-process(clk)
+process(clk, start_monpro_delayed)
 begin
     if (clk'event AND clk = '1') then
         start_monpro <= start_monpro_delayed;
