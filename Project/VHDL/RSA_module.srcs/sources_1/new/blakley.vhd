@@ -49,7 +49,7 @@ architecture Behavioral of blakley is
     signal running: std_logic;
 begin
 
-    process(clk, reset_n, start)
+    process(clk, reset_n, start, running)
         variable p_tmp : STD_LOGIC_VECTOR (OPERAND_WIDTH downto 0);
     begin
         if (reset_n = '0') then
