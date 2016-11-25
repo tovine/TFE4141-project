@@ -5,8 +5,8 @@
 %Make sure you refer to the figures (such as Figure \ref{fig:universe}) and charts you add in the text.
 %Avoid putting lots of source code here -- small code snippets are fine if you want to discuss something specific.
 \section{Presentation of the solution}
-We chose to implement the RSA circuit using one module for the MonPro operation, a datapath module with various registers for storing inputs and intermediate results and a top-level controller module with a state machine and control signals for the datapath.
-In order to use Montgomery's algorithm without taking additional parameters, a simplified version of Blakley's algorithm was used to compute
+The choosen algorithm for this project was to use the Montgomery Exponentiation method. For our RSA circuit we chose to implement one module for the MonPro operation, a datapath module with various registers for storing inputs and intermediate results and a top-level controller module with a state machine and control signals for the datapath.\\
+In order to use Montgomery's algorithm without taking additional parameters, a simplified version of Blakley's algorithm was used to compute the following required input parameters:
 \begin{equation}
     \bar{x}=1*R*mod(n), R=2^{128}
 \end{equation}
@@ -14,24 +14,41 @@ In order to use Montgomery's algorithm without taking additional parameters, a s
     \bar{M}=M*R*mod(n), R=2^{128}
 \end{equation}
 
+The top level implementation is as seen in figure \ref{fig:toplevel}. The datapath takes the input signals 32-bits at a time and these signals are then loaded in each their own 128-bit register. The control state machine handles the control signals and the ....
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/TopLevel}
+\caption{A top-level overview of the RSA circuit.}
+\label{fig:toplevel}
+\end{figure}
+
+\subsubsection{Datapath}
+The datapath is where all the data flow and storage happens. It takes control signals from the top level ControlFSM and is responsible for making sure tha the correct registers are loaded via muxes and load\_enable signals.\\
+To make data loading easier, a modified version of the register supplied in the module library was created with an additional load\_enable pin. This allowed for the use of a common input data bus, instead of shift registers or a tree of demultiplexers to route the data. The code for this register can be seen in appendix \ref{list:register_enable_reset_n}.
 
 \subsection{Blakley module}
-In our case
-The blakley module is implemented 
+In our case, the Blakley module is only needed for data preprocessing before the main algorithm can start working. Because of this a simplified Blakley module was implemented, based on assumptions about the input.\\
+The module is implemented with combinational arithmetics, and an internal iteration counter is used to determine when the computations are complete and the 'complete' signal can be sent. The result data gets propagated to the output bus immediately after each cycle.\\
+In hindsight the combinational and sequential parts should probably have been split into separate processes, but it worked satisfactory to fullfill its purpose in this case.\\
+However, when uploaded to the FPGA for testing it would not synthesize.
 
 \subsection{Monpro module}
-
+Much like the Blakley module it is implemented using combinational arithmetics, but in addition there is a more clear separation between the synchronous and combinational parts as some combinational feedback previously occurred when running multiple iterations in a row.\\
+Here, the result and 'complete' signal output was also delayed by one clock cycle in an attempt to reduce the potential for combinational feedback problems.
 
 \subsection{Stitching everything together}
+The state machine keeps track of the inputs and states of various registers, and is responsible for starting the different operations at the right time, while setting control signals for routing the results into the correct registers.\\
+It's implemented as a Mealy machine\cite{mealy}, and sends control signals to the datapath which actually routes and stores the data. A simplified state diagram (without output signals) can be seen in figure \ref{fig:statediagramrsa}.
 
-%\begin{figure}
-%\centering
-%\includegraphics[scale=1.7]{images/universe.jpg}
-%\caption{A JPEG image of a galaxy. Use vector graphics instead if you can.}
-%\label{fig:universe}
-%\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{images/StateDiagram}
+\caption{State diagram for RSA module}
+\label{fig:statediagramrsa}
+\end{figure}
 %%
 %Add content in this section that describes how you tested and verified the correctness of your implementation, with respect to the requirements of the assignment.
+
 \section{Verification plan}
 - Write a verification plan.\\
 - What metrics will you use to decide when you are done verifying?
@@ -40,7 +57,13 @@ The blakley module is implemented
 - What bring up test strategy have you planned?\\ 
 - Discuss/Analyze/Conclude\\
 \\
-Each submodule of the design was verified with its own testbench.
+Before starting to implement the actual VHDL code, the algorithm had to be verified. For this, a simple python program was written that implemented the desired behavior:
+
+\inputminted[firstline=45,lastline=56]{python}{../Project/monexp.py}
+
+This was then used alongside the simulator and waveform window to check that the output actually matched what it was supposed to be at any given time, and was a great aid in debugging.\\
+
+Each submodule of the design was verified with its own testbench. % TODO: add source ref.
 The RSAcore module was verified using the testbenches provided by Øystein Gjermundnes.
 \\
-Improvements in the verification plan would have been to use Bitvis library.
+Improvements in the verification plan would have been to use Bitvis library, but this would have required a different VHDL compiler than Vivado. Assertions in the testbench code would also have been a possible (and somewhat simpler) solution.
