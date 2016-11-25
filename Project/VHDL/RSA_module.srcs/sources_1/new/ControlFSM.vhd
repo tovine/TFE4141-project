@@ -78,8 +78,8 @@ begin
     -- Set default values for internal signals
 	if (reset_n = '0') then
 		monpro_second_round <= '0';
-	else
-		monpro_second_round <= monpro_second_round;
+--	else
+--		monpro_second_round <= monpro_second_round;
 	end if;
     increment_substate <= '0';
     clear_substate <= '0';

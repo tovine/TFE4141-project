@@ -9,7 +9,7 @@ def getBitAt(a, n):
 	else:
 		return 0
 
-# Returns a*b mod n - seems to work, as long as r is passed as parameter 1
+# Returns a*b mod n
 def blakley(a,b,n):
 	k=129 # 2^128 is a 129 bit number!
 	print('Blakley: ',hex(a),hex(b),hex(n))
@@ -26,7 +26,7 @@ def blakley(a,b,n):
 	return p
 
 
-# Returns u = a\*b\*r^-1 (mod n)
+# Returns u = a*b*r^-1 (mod n)
 def monpro(a,b,n):
 	print('monpro: ',a,b,n)
 	u=0
