@@ -1,0 +1,46 @@
+\chapter{Methodology}
+%This chapter should discuss the details of your implementation for the assignment. 
+%Everything related to \emph{how} things were done should go here.
+%Remember to avoid going into too much details, summarize appropriately and try to use figures/charts.
+%Make sure you refer to the figures (such as Figure \ref{fig:universe}) and charts you add in the text.
+%Avoid putting lots of source code here -- small code snippets are fine if you want to discuss something specific.
+\section{Presentation of the solution}
+We chose to implement the RSA circuit using one module for the MonPro operation, a datapath module with various registers for storing inputs and intermediate results and a top-level controller module with a state machine and control signals for the datapath.
+In order to use Montgomery's algorithm without taking additional parameters, a simplified version of Blakley's algorithm was used to compute
+\begin{equation}
+    \bar{x}=1*R*mod(n), R=2^{128}
+\end{equation}
+\begin{equation}
+    \bar{M}=M*R*mod(n), R=2^{128}
+\end{equation}
+
+
+\subsection{Blakley module}
+In our case
+The blakley module is implemented 
+
+\subsection{Monpro module}
+
+
+\subsection{Stitching everything together}
+
+%\begin{figure}
+%\centering
+%\includegraphics[scale=1.7]{images/universe.jpg}
+%\caption{A JPEG image of a galaxy. Use vector graphics instead if you can.}
+%\label{fig:universe}
+%\end{figure}
+%%
+%Add content in this section that describes how you tested and verified the correctness of your implementation, with respect to the requirements of the assignment.
+\section{Verification plan}
+- Write a verification plan.\\
+- What metrics will you use to decide when you are done verifying?
+(pass rate, code coverage, functional coverage).\\
+- Demonstrate the use of assertions \\
+- What bring up test strategy have you planned?\\ 
+- Discuss/Analyze/Conclude\\
+\\
+Each submodule of the design was verified with its own testbench.
+The RSAcore module was verified using the testbenches provided by Øystein Gjermundnes.
+\\
+Improvements in the verification plan would have been to use Bitvis library.
