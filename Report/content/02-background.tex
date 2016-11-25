@@ -2,7 +2,7 @@
 %This chapter should describe the theoretical background needed to understand and solve the problem. 
 %For instance, a description of the hardware platform or specific components involved in this assignment, definition of concepts that are important to understand the solution should be summarized here.
 %Add citations to show sources whenever appropriate, LaTeX and bibliography managers make this easy. For instance, ``I always thought something was fundamentally wrong with the universe'' \cite{adams1995hitchhiker}.
-\section{Problem Description and Analysis}
+\section{Problem Description and Analysis} % TODO: move this section to intro?
 
 - Describe the problem you are trying to solve?\\
 - What are the main requirements?\\
@@ -21,7 +21,7 @@ Design and implement hardware for an RSA encryption/decryption circuit that meet
 \caption{Interface communication protocol}
 \label{fig:interface}
 \end{figure}
-The RSA-module has to be configured with the correct keys. Each key consists of two 128-bit integers.
+The RSA-module has to be configured with the correct keys, where each key consists of two 128-bit integers.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -52,7 +52,7 @@ Appropriate values for e,d, and n can be found using Euler's theorem.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Method for computing $M^emod n$}
+\section{Method for computing $M^emod(n)$}
 Modular exponentiation is achieved by replacing all multiplications in the algorithm by modular multiplications.
 The computation of $M^e(mod n)$ is called modular exponentiation. In the exponentation process for the RSA algorithm, we know the exponent (e) and the modulus (n) in advance but not the base (M). 
 The modular exponentiation can be broken into a series of modular multiplications and modular squaring operations.
@@ -61,6 +61,7 @@ Computing $C:= M^e (mod n)$ by first exponentiation and then performing a divisi
 \begin{equation}
     log_2(M^e)=e*log_2(M) = 2^{128}*128=2^{135} = 10^{40}
 \end{equation}
+bits in order to store $M^e$.
 
 The naive method of computing a modular multiplication requires e-1 modular multiplications. However not all power of M need to be computed. Using squerings you can reduce the number of multiplications. This method is called the binary method or square and multiply method.
 The binary method for computing $M^emodn$ given the integers M, e, and n has two variations depending on the direction by which the bits of e are scanned: Left-to-Right(LR) and Right-to-Left(RL).
@@ -122,14 +123,17 @@ The resulting number $\bar{R}$ is the n-residue of the product
 \begin{equation}
     R= a * b mod n
 \end{equation}
-
+In order to describe the Montgomery reduction algorithm, we need an additional quantity, n', which is the integer wit the property 
+\begin{equation}
+    r * r^{-1} - n * n' =1
+\end{equation}
 The Montgomery algorithm computes
 \begin{equation}
     MonPro(A,B) = A * B * r^{-1}mod n
 \end{equation}
 
-The product $u = A * B * 2^{-k}(mod n)$ can be compute by the following binary add-shift algorithm:
-\begin{algorithm}
+We take $r=2^k$ and assume that the number of bits in A or B is less than k. The product $u = A * B * 2^{-k}(mod n)$ can be compute by the following binary add-shift algorithm:\\
+\begin{algorithm}[H]
 
     1. u:=0\\
     2. for i= 0 to k-1\\
@@ -137,7 +141,23 @@ The product $u = A * B * 2^{-k}(mod n)$ can be compute by the following binary a
     2b.\quad if u is odd then u:=u+n\\
     2c.\quad u:=u/2\\
 \end{algorithm}
+The most important feature of the Montgomery product algorithm is that the operations involved are multiplications modulo r and divisions by r, both of which are intrinsically fast operations since r is a power of 2 \cite{highspeedrsa}.
 
+
+\section{Montgomery Exponentiation}
+One can use the montgomery product algorithm to when several modular multiplications with the same modulus are needed, for instance when we need to compute $M^e mod n$. One can use one of the addition chain algorithm to replace the exponentiation with a series of multiplication and squaring modular operations. Using the binary method for the exponentiation we then have:
+
+\begin{algorithm}
+function ModExp(M,e,n){n is an odd number}\\
+Step 1. Compute n' using the extended Euclidean algorithm.\\
+Step 2. $\bar{M} := M* r mod n\\
+Step 3. \bar{x}:= 1* r mod n$\\
+Step 4. for $i=k-1$ downto $0$ do\\
+Step 5. \quad $\bar{x}= MonPro(\bar{x},\bar{x})$\\
+Step 6. \quad if $e_i =1$ then $\bar{x}:= MonPro(\bar{M}, \bar{x})$\\
+Step 7. $x:= MonPro(\bar{x},1)$\\
+Step 8. return $x$\\
+\end{algorithm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{VHDL}
