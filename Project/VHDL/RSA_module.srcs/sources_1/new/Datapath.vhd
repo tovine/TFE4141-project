@@ -181,9 +181,8 @@ load_msg_2 <= load_msg(2) OR load_blakley_to_msg;
 load_msg_3 <= load_msg(3) OR load_blakley_to_msg;   
 
 -- Route the correct 32 bits to the output
-select_output_register : process (clk, select_output, monpro_result)
+select_output_register : process (select_output, monpro_result)
 begin
-if (clk'event AND clk = '1') then
     case(select_output) is
     when "11" =>
         data_out <= monpro_result(127 downto 96);
@@ -194,7 +193,6 @@ if (clk'event AND clk = '1') then
     when others => -- "00"
         data_out <= monpro_result(31 downto 0);
     end case;
-end if;
 end process;
 
 -- *************************************************************
