@@ -2,33 +2,13 @@
 %This chapter should describe the theoretical background needed to understand and solve the problem. 
 %For instance, a description of the hardware platform or specific components involved in this assignment, definition of concepts that are important to understand the solution should be summarized here.
 %Add citations to show sources whenever appropriate, LaTeX and bibliography managers make this easy. For instance, ``I always thought something was fundamentally wrong with the universe'' \cite{adams1995hitchhiker}.
-\section{Problem Description and Analysis} % TODO: move this section to intro?
-
-- Describe the problem you are trying to solve?\\
-- What are the main requirements?\\
-- What do you need to investigate further before proposing a solution?\\
-
-Design and implement hardware for an RSA encryption/decryption circuit that meets the requirements listed in figure \ref{fig:req}. The message blocks to be encrypted will be 128-bit wide, and divided into four 32-bit packets for transmission via a 32-bit wide parallell data bus into the circuit.
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.7\textwidth]{images/requierements.PNG}
-\caption{Design specification}
-\label{fig:req}
-\end{figure}
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.7\textwidth]{images/communication.PNG}
-\caption{Interface communication protocol}
-\label{fig:interface}
-\end{figure}
-The RSA-module has to be configured with the correct keys, where each key consists of two 128-bit integers.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{RSA encryption/decryption}
 RSA has its name from the creators; Ron Rivest, Adi Shamir and Len Adleman. RSA uses two different keys. One for encryption (public key); the other is for decryption (private key). \\
 This is an asymmetric algorithm, with the important advantage that anyone can encrypt a message for the receiver (using the public part of the key pair), but only the receiver (who has the private key) can decrypt and read it. The method relies on a one-way function f such that it is easy to compute $Y=f(X)$, but (practically) impossible to compute $X=f_1(Y)$, unless you have the correct key $k$.
-
+\\
 RSA is widely used in electronic commerce protocols (banking, online shopping and such), and is believed to be secure, given sufficiently long keys and the use of up-to-date implementations. As of 2016 the recommended key length is minimum 2048 bits for a good balance between speed and security.
 
 \begin{figure}[H]
@@ -52,12 +32,12 @@ Appropriate values for e,d, and n can be found using Euler's theorem.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Method for computing $M^emod(n)$}
+\section{Methods for computing $M^emod(n)$}
 Modular exponentiation is achieved by replacing all multiplications in the algorithm by modular multiplications.
-The computation of $M^e(mod n)$ is called modular exponentiation. In the exponentation process for the RSA algorithm, we know the exponent (e) and the modulus (n) in advance but not the base (M). 
+The computation of $M^e(mod(n))$ is called modular exponentiation. In the exponentation process for the RSA algorithm, we know the exponent (e) and the modulus (n) in advance but not the base (M). 
 The modular exponentiation can be broken into a series of modular multiplications and modular squaring operations.
 
-Computing $C:= M^e (mod n)$ by first exponentiation and then performing a division to obtain the remainder $C:=(M^e)\%n $ would have resulted in an enormous space requirement. Assuming, M and e have 128 bits each, we need
+Computing $C:= M^e (mod(n))$ by first exponentiation and then performing a division to obtain the remainder $C:=(M^e)\%n $ would have resulted in an enormous space requirement. Assuming, M and e have 128 bits each, we need
 \begin{equation}
     log_2(M^e)=e*log_2(M) = 2^{128}*128=2^{135} = 10^{40}
 \end{equation}
@@ -80,14 +60,16 @@ The binary method for computing $M^emodn$ given the integers M, e, and n has two
 
 The bits of e are scanned from the most significant to the least significant, and a modular squaring is performed for each bit. A modular multiplication operation is performed only if the bit is 1.
 
-\section{Modular Multiplication}
-There are four approaches for computing P= AB (mod n).\\
-Multiply and then Reduce:First multiply $t:=a*b$. Here t is a 2k-bit or 2s-word number. The reduction is accomplished by dividingt t by n, and we obtain the reminder.\\
-The steps of the multiplication and reduction are interleaved (Blakley's method).\\
-Brickell's method\\
-Montgomery's method: This algorithm rearranges the residue class modulo n, and uses module $2^j$ arithmetic.\\
+\subsection{Modular Multiplication}
+There are four approaches for computing P= AB (mod n) in hardware.\cite{rsahardware}\\
+\begin{itemize}
+  \item Multiply and then Reduce:First multiply $t:=a*b$. Here t is a 2k-bit or 2s-word number. The reduction is accomplished by dividingt t by n, and we obtain the reminder.
+  \item The steps of the multiplication and reduction are interleaved (Blakley's method).
+  \item Brickell's method.
+  \item Montgomery's method: This algorithm rearranges the residue class modulo n, and uses module $2^j$ arithmetic.
+\end{itemize}
 
-\section{Bakley's Method}
+\subsubsection{Blakley's Method}
 Computes $a*b mod n$ by interleaving the shift-add steps of the multiplication and the shift-substract steps of the division. This is a bit-by-bit multiplication algorithm.
 
 \begin{algorithm}
@@ -105,13 +87,12 @@ This algorithm computes the remainder R in k steps, where at each step one addit
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Montgomery's Method}
-Montgomery's algorithm is an efficient way of doing modular multiplication, based around the principle that... (sett inn teori fra PDF her)
-This algorithm works extremly well when implemented on general-purpose computers (signal processors or microprocessors) which are capable of performing fast arithmetic modulo a power of 2. 
+\subsubsection{Montgomery's Method}
+Montgomery's algorithm is an efficient way of doing modular multiplication. This algorithm works extremly well when implemented on general-purpose computers (signal processors or microprocessors) which are capable of performing fast arithmetic modulo a power of 2. 
 
-This algorithm replace division by n operation with division by a power of 2. This operation is easily accomplished on a computer since the numbers are represented in binary form\cite{highspeedrsa}.
+This algorithm replaces the division-by-n operation with division by a power of 2. This operation is easily accomplished on a computer since the numbers are represented in binary form\cite{highspeedrsa}, and one only needs to shift the number $log(n)$ places to right.
 
-The montgomery product is define as
+The Montgomery product is defined as
 \begin{equation}
     \bar{R}= \bar{a} * \bar{b} * r^{-1} mod n
 \end{equation}
@@ -121,7 +102,7 @@ where $r^{-1}$ is the inverse of r module n
 \end{equation}
 The resulting number $\bar{R}$ is the n-residue of the product
 \begin{equation}
-    R= a * b mod n
+    R= a * b * mod (n)
 \end{equation}
 In order to describe the Montgomery reduction algorithm, we need an additional quantity, n', which is the integer wit the property 
 \begin{equation}
@@ -144,7 +125,7 @@ We take $r=2^k$ and assume that the number of bits in A or B is less than k. The
 The most important feature of the Montgomery product algorithm is that the operations involved are multiplications modulo r and divisions by r, both of which are intrinsically fast operations since r is a power of 2 \cite{highspeedrsa}.
 
 
-\section{Montgomery Exponentiation}
+\subsection{Montgomery Exponentiation}
 One can use the montgomery product algorithm to when several modular multiplications with the same modulus are needed, for instance when we need to compute $M^e mod n$. One can use one of the addition chain algorithm to replace the exponentiation with a series of multiplication and squaring modular operations. Using the binary method for the exponentiation we then have:
 
 \begin{algorithm}

@@ -5,6 +5,7 @@
 
 \documentclass[abstract=on]{scrreprt}
 \usepackage[utf8]{inputenc}
+\usepackage[toc,page]{appendix}
 
 
 \usepackage{natbib}
@@ -14,7 +15,7 @@
 \usepackage{minted}
 \usepackage{algorithm2e}
 \usepackage{tabto}
-
+\usemintedstyle{borland}
 % Edit the meta.tex file to change title, group number and author names
 \input{meta.tex}
 
@@ -25,15 +26,18 @@
 
 
 % Main matter - edit corresponding file under content/ to change
+
 \input{content/00-abstract.tex}
+\tableofcontents
 \input{content/01-introduction.tex}
 \input{content/02-background.tex}
 \input{content/03-methodology.tex}
 \input{content/04-results.tex}
 \input{content/05-conclusion.tex}
 
-
 % Bibliography - edit references.bib and use the \cite command in text
 \bibliographystyle{plain}
 \bibliography{references}
+\input{content/06-appendix.tex}
+
 \end{document}
